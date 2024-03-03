@@ -1,27 +1,41 @@
-# BumperPlatesFront
+# Bumper Plates
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 17.0.3.
+This is a simple web application built with Angular that helps users calculate the number of bumper plates needed to achieve a desired weight on a barbell.
 
-## Development server
+## Features
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+- Calculate the number of bumper plates needed for a desired weight
+- Choose between pounds (lbs) and kilograms (kg) for input and output
+- Visual display of the calculated bumper plates
+- Responsive design for mobile and desktop devices
 
-## Code scaffolding
+## Usage
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/exondre/bumper-plates-front.git
+   ```
 
-## Build
+2. **Navigate to the project directory:**
+   ```bash
+   cd bumper-plates-calculator
+   ```
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+3. **Install dependencies:**
 
-## Running unit tests
+    ```bash
+    npm install
+    ```
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+4. **Run the application:**
+    ```bash
+    ng serve
+    ```
+    Navigate to http://localhost:4200/ in your web browser to use the application.
 
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+## Usage Notes
+- Enter the weight of the barbell and the desired total weight in the input fields.
+- Select the preferred unit of weight (pounds or kilograms) using the dropdown menu.
+- The application will calculate and display the required bumper plates for each side of the barbell.
+- The "Extra Weight" field indicates any additional weight needed to reach the desired total weight.
+- Adjust the input values as needed and observe how the bumper plate calculations change accordingly.
