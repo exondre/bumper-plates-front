@@ -4,37 +4,23 @@
 /dist
 /tmp
 /out-tsc
-# Only exists if Bazel was run
 /bazel-out
 
-# Dependencies
+# Node
 /node_modules
 npm-debug.log
 yarn-error.log
 
-# Cordova
-/www
-/plugins
-/platforms
-
-# Electron
-/dist-electron
-/dist-packages
-/electron.main.js
-
 # IDEs and editors
-.idea/*
-!.idea/runConfigurations/
-!.idea/codeStyleSettings.xml
+.idea/
 .project
 .classpath
 .c9/
 *.launch
 .settings/
-xcuserdata/
 *.sublime-workspace
 
-# IDE - VSCode
+# Visual Studio Code
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
@@ -42,25 +28,15 @@ xcuserdata/
 !.vscode/extensions.json
 .history/*
 
-# Maven
-/target
-/log
-
 # Miscellaneous
 /.angular/cache
 .sass-cache/
-/.sass-cache
 /connect.lock
 /coverage
 /libpeerconnection.log
-npm-debug.log
-yarn-error.log
 testem.log
 /typings
-/reports
-/src/translations/template.*
-# /src/environments/.env.*
 
-# System Files
+# System files
 .DS_Store
 Thumbs.db
