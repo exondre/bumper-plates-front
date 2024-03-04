@@ -1,20 +1,23 @@
 <div class="container">
-    <h2>Calculadora de porcentajes</h2>
-    <div class="form-group">
-      <label for="personalRecord">Ingresa tu RM: </label>
-      <input type="number" class="form-control" id="personalRecord" [(ngModel)]="personalRecord" name="personalRecord"> 
+  <h2>Calculadora de porcentajes</h2>
+  <div class="form-group">
+    <label for="personalRecord">Ingresa tu RM: </label>
+    <div>
+      <input type="number" class="form-control" id="personalRecord" [(ngModel)]="personalRecord" name="personalRecord">
       <label for="weightUnit"> </label>
       <select id="weightUnit" [(ngModel)]="selectedUnit">
         <option value="lbs">lbs</option>
         <option value="kg">kg</option>
       </select>
     </div>
-    <div class="form-group">
-      <button class="btn btn-primary" (click)="calculate()">Calcular</button>
-    </div>
-    <div *ngIf="percentages[0].percentageWeight > 0">
-      <ul>
-        <li *ngFor="let p of percentages"><strong>{{ p.percentageName }}: </strong>{{ p.percentageWeight }} {{selectedUnit}}</li>
-      </ul>
-    </div>
   </div>
+  <div class="form-group">
+    <button class="btn btn-primary" (click)="calculate()">Calcular</button>
+  </div>
+  <div *ngIf="percentages[0].percentageWeight > 0">
+    <ul>
+      <li *ngFor="let p of percentages"><strong>{{ p.percentageName }}: </strong>{{ p.percentageWeight }}
+        {{selectedUnit}}</li>
+    </ul>
+  </div>
+</div>

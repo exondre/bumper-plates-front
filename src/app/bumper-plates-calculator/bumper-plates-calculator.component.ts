@@ -10,27 +10,29 @@ import { FormsModule } from '@angular/forms';
   styleUrls: ['./bumper-plates-calculator.component.scss'],
 })
 export class BumperPlatesCalculatorComponent {
-  barWeight: number;
+  initialWeight: number;
   desiredWeight: number;
   requiredBumpers: any[];
   achievedWeight: number;
   extraWeight: number;
-  selectedUnit: string;
+  initialWeightUnit: string;
+  desiredWeightUnit: string;
 
   constructor() {
-    this.barWeight = 20; // Default bar weight
+    this.initialWeight = 20; // Default bar weight
     this.desiredWeight = 100; // Default desired weight
     this.requiredBumpers = [];
     this.achievedWeight = 0;
     this.extraWeight = 0;
-    this.selectedUnit = 'lbs';
+    this.initialWeightUnit = 'kg';
+    this.desiredWeightUnit = 'lbs';
   }
 
   calculate() {
     // Implement your calculation logic here
     // Assign values to bumpersNecessary, achievedWeight, and extraWeight
 
-    const result = this.calculateBumpers(this.barWeight, this.desiredWeight, this.selectedUnit);
+    const result = this.calculateBumpers(this.initialWeight, this.initialWeightUnit, this.desiredWeight, this.desiredWeightUnit);
     this.requiredBumpers = result.requiredBumpers;
     this.achievedWeight = result.achievedWeight;
     this.extraWeight = result.extraWeight;
@@ -38,12 +40,13 @@ export class BumperPlatesCalculatorComponent {
 
   /**
    * Calculate the required bumpers to achieve the desired weight on a barbell.
-   * @param {number} barbellWeight - The weight of the barbell in kilograms or pounds.
+   * @param {number} initialWeight - The initial weight, might be the barbell or otherwise, in kilograms or pounds.
+   * @param {string} initialUnit - The unit of initial weight, either 'kg' for kilograms or 'lbs' for pounds.
    * @param {number} desiredWeight - The desired total weight on the barbell in kilograms or pounds.
-   * @param {string} desiredUnit - The unit of weight desired, either 'kg' for kilograms or 'lbs' for pounds.
+   * @param {string} desiredUnit - The unit of desired weight, either 'kg' for kilograms or 'lbs' for pounds.
    * @returns {object} An object containing the necessary bumpers, the achieved weight, and the extra weight.
    */
-  calculateBumpers(barbellWeight: number, desiredWeight: number, desiredUnit: string) {
+  calculateBumpers(initialWeight: number, initialUnit:string , desiredWeight: number, desiredUnit: string) {
     const availableBumpers = [
       { bumperName: '45 lbs', bumperUnit: 'lbs', bumperValue: 45 },
       { bumperName: '35 lbs', bumperUnit: 'lbs', bumperValue: 35 },
@@ -60,13 +63,17 @@ export class BumperPlatesCalculatorComponent {
     const poundToKiloFactor = 0.453592;
     const kiloToPoundFactor = 2.20462;
 
+    if (initialUnit === 'lbs') {
+      initialWeight *= poundToKiloFactor; // Convert to kilograms
+    }
+
     // Convert the desired weight to the same unit as the barbell
     if (desiredUnit === 'lbs') {
       desiredWeight *= poundToKiloFactor; // Convert to kilograms
     }
 
     // Calculate the total desired weight
-    let totalDesiredWeight = (desiredWeight - barbellWeight) / 2;
+    let totalDesiredWeight = (desiredWeight - initialWeight) / 2;
 
     // Convert the bumper values to kilograms if the unit is in pounds
     availableBumpers.forEach((bumper) => {
@@ -105,7 +112,7 @@ export class BumperPlatesCalculatorComponent {
       }
     }
 
-    const totalAchievedWeight = achievedWeight * 2 + barbellWeight;
+    const totalAchievedWeight = achievedWeight * 2 + initialWeight;
 
     // Return the required bumpers, the achieved weight, and the remaining weight
     return {
