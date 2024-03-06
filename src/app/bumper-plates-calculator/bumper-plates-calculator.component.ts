@@ -38,6 +38,12 @@ export class BumperPlatesCalculatorComponent {
     this.extraWeight = result.extraWeight;
   }
 
+  switchDesiredToInitial() {
+    this.initialWeight = this.desiredWeight;
+    this.initialWeightUnit = this.desiredWeightUnit;
+    this.desiredWeight = 0;
+  }
+
   /**
    * Calculate the required bumpers to achieve the desired weight on a barbell.
    * @param {number} initialWeight - The initial weight, might be the barbell or otherwise, in kilograms or pounds.

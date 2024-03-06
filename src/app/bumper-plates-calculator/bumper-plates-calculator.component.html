@@ -2,7 +2,7 @@
   <h2>Calculadora de discos</h2>
   <div class="form-group">
     <label for="initialWeight">Peso de la barra o el total cargado: </label>
-    <div>
+    <div class="input-group">
       <input type="number" class="form-control" id="initialWeight" [(ngModel)]="initialWeight" name="initialWeight">
       <label for="initialWeightUnit"> </label>
       <select id="initialWeightUnit" [(ngModel)]="initialWeightUnit">
@@ -13,7 +13,7 @@
   </div>
   <div class="form-group">
     <label for="desiredWeight">Peso deseado: </label>
-    <div>
+    <div class="input-group">
       <input type="number" class="form-control" id="desiredWeight" [(ngModel)]="desiredWeight" name="desiredWeight">
       <label for="desiredWeightUnit"> </label>
       <select id="desiredWeightUnit" [(ngModel)]="desiredWeightUnit">
@@ -22,8 +22,9 @@
       </select>
     </div>
   </div>
-  <div class="form-group">
+  <div class="form-group button-group">
     <button class="btn btn-primary" (click)="calculate()">Calcular</button>
+    <button class="btn btn-primary" (click)="switchDesiredToInitial()">1 2... Switch!</button>
   </div>
   <div *ngIf="requiredBumpers.length > 0">
     <h2>Discos a cargar:</h2>

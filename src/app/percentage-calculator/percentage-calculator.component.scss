@@ -8,7 +8,17 @@ h2 {
     align-items: stretch;
     flex-direction: column;
 
-    button {
+    .input-group {
+        display: flex;
+        align-items: stretch;
+        
+        *:not(:first-child) {
+            margin-left: 5px;
+        }
+    }
+
+    &.button-group {
         margin-top: 10px;
     }
+
 }
