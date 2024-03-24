@@ -16,8 +16,8 @@
   </div>
   <div *ngIf="percentages[0].percentageWeight > 0">
     <ul>
-      <li *ngFor="let p of percentages"><strong>{{ p.percentageName }}: </strong>{{ p.percentageWeight }}
-        {{selectedUnit}}</li>
+      <li *ngFor="let p of percentages"><strong>{{ p.percentageName }}: </strong> <a href="#" (click)="sendToPlatesCalculator($event, p)"> {{ p.percentageWeight }} 
+        {{selectedUnit}}</a> </li>
     </ul>
   </div>
 </div>

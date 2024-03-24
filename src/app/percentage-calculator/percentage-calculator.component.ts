@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { SharedService } from '../service/shared.service';
 
 
 @Component({
@@ -11,30 +12,39 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './percentage-calculator.component.scss'
 })
 export class PercentageCalculatorComponent {
+  selectedUnit: string;
   personalRecord: number;
   percentages: any[];
-  selectedUnit: string;
 
-  constructor() {
+  constructor(private sharedService: SharedService) {
+    this.selectedUnit = 'lbs';
     this.personalRecord = 150; // Default PR
     this.percentages = [
-      {percentageName: '100%', percentageValue: 100, percentageWeight: 0},
-      {percentageName: '95%', percentageValue: 95, percentageWeight: 0},
-      {percentageName: '90%', percentageValue: 90, percentageWeight: 0},
-      {percentageName: '85%', percentageValue: 85, percentageWeight: 0},
-      {percentageName: '80%', percentageValue: 80, percentageWeight: 0},
-      {percentageName: '75%', percentageValue: 75, percentageWeight: 0},
-      {percentageName: '70%', percentageValue: 70, percentageWeight: 0},
-      {percentageName: '65%', percentageValue: 65, percentageWeight: 0},
-      {percentageName: '60%', percentageValue: 60, percentageWeight: 0},
-      {percentageName: '55%', percentageValue: 55, percentageWeight: 0},
-      {percentageName: '50%', percentageValue: 50, percentageWeight: 0},
+      {percentageName: '115%', percentageValue: 115, percentageWeight: 0, unit: this.selectedUnit},
+      {percentageName: '110%', percentageValue: 110, percentageWeight: 0, unit: this.selectedUnit},
+      {percentageName: '105%', percentageValue: 105, percentageWeight: 0, unit: this.selectedUnit},
+      {percentageName: '100%', percentageValue: 100, percentageWeight: 0, unit: this.selectedUnit},
+      {percentageName: '95%', percentageValue: 95, percentageWeight: 0, unit: this.selectedUnit},
+      {percentageName: '90%', percentageValue: 90, percentageWeight: 0, unit: this.selectedUnit},
+      {percentageName: '85%', percentageValue: 85, percentageWeight: 0, unit: this.selectedUnit},
+      {percentageName: '80%', percentageValue: 80, percentageWeight: 0, unit: this.selectedUnit},
+      {percentageName: '75%', percentageValue: 75, percentageWeight: 0, unit: this.selectedUnit},
+      {percentageName: '70%', percentageValue: 70, percentageWeight: 0, unit: this.selectedUnit},
+      {percentageName: '65%', percentageValue: 65, percentageWeight: 0, unit: this.selectedUnit},
+      {percentageName: '60%', percentageValue: 60, percentageWeight: 0, unit: this.selectedUnit},
+      {percentageName: '55%', percentageValue: 55, percentageWeight: 0, unit: this.selectedUnit},
+      {percentageName: '50%', percentageValue: 50, percentageWeight: 0, unit: this.selectedUnit},
     ];
-    this.selectedUnit = 'lbs';
   }
 
   calculate() {
     this.percentages = this.calculatePercentages(this.personalRecord);
+  }
+
+  sendToPlatesCalculator(ev: MouseEvent, p: any) {
+    ev.preventDefault();
+    this.sharedService.sendSelectedPercentageEvent(p);
+    // console.log(`${weight} ${unit}.`);
   }
 
   calculatePercentages(personalRecord: number) {

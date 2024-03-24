@@ -1,6 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { Subscription } from 'rxjs';
+import { SharedService } from '../service/shared.service';
 
 @Component({
   selector: 'app-bumper-plates-calculator',
@@ -9,7 +11,7 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './bumper-plates-calculator.component.html',
   styleUrls: ['./bumper-plates-calculator.component.scss'],
 })
-export class BumperPlatesCalculatorComponent {
+export class BumperPlatesCalculatorComponent implements OnDestroy {
   initialWeight: number;
   desiredWeight: number;
   requiredBumpers: any[];
@@ -17,8 +19,9 @@ export class BumperPlatesCalculatorComponent {
   extraWeight: number;
   initialWeightUnit: string;
   desiredWeightUnit: string;
+  selectedPercentageSuscription: Subscription;
 
-  constructor() {
+  constructor(private sharedService: SharedService) {
     this.initialWeight = 20; // Default bar weight
     this.desiredWeight = 100; // Default desired weight
     this.requiredBumpers = [];
@@ -26,6 +29,18 @@ export class BumperPlatesCalculatorComponent {
     this.extraWeight = 0;
     this.initialWeightUnit = 'kg';
     this.desiredWeightUnit = 'lbs';
+
+    this.selectedPercentageSuscription = this.sharedService.getSelectedPercentageEvent().subscribe(p => {
+      // Perform actions based on the received data
+      console.log(p);
+      this.desiredWeight = p.percentageWeight;
+      this.desiredWeightUnit = p.unit;
+      this.calculate();
+    });
+  }
+
+  ngOnDestroy(): void {
+      this.selectedPercentageSuscription.unsubscribe();
   }
 
   calculate() {

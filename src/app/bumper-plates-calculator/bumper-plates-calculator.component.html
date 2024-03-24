@@ -31,7 +31,7 @@
     <ul>
       <li *ngFor="let bumper of requiredBumpers">{{ bumper.bumperName }} ({{ bumper.quantity }})</li>
     </ul>
-    <p>Peso alcanzado: {{ achievedWeight }} {{ desiredWeightUnit }}</p>
-    <p>Peso extra: {{ extraWeight }} {{ desiredWeightUnit }}</p>
+    <p>Peso alcanzado: {{ achievedWeight | number:'1.2-2' }} {{ desiredWeightUnit }}</p>
+    <p>Peso extra: {{ extraWeight | number:'1.2-2' }} {{ desiredWeightUnit }}</p>
   </div>
 </div>
