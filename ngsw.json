@@ -1,6 +1,6 @@
 {
   "configVersion": 1,
-  "timestamp": 1721098757781,
+  "timestamp": 1721098861578,
   "index": "/index.html",
   "assetGroups": [
     {
@@ -57,7 +57,7 @@
     "/assets/icons/old_icon-512x512.png": "1de182f76f7329dfa8f9fcdd1fdcdd695bea6a99",
     "/assets/kandor.jpeg": "dbcd5f6905bb6ee2679babaf69afeb7214f9fffc",
     "/favicon.ico": "84208af9b67c402ac993576c03f155933b17b598",
-    "/index.html": "86cf0b9d82becc82938c0db573c08a3802380e5c",
+    "/index.html": "790c29faa72eed6ddeac809af529c1c2fd65c5f1",
     "/main-QQLKA2ZE.js": "c73468c9cd71dd6ee757a4614e272e5a784a2219",
     "/manifest.webmanifest": "75571fb7a057154726cde71a2141a66350cf77c0",
     "/polyfills-6EAL64PA.js": "d874147a12a6570d9b44e99935e9de8b7f3cabbc",
