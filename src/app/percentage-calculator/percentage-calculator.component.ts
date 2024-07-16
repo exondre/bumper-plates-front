@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { SharedService } from '../service/shared.service';
+import { Subscription } from 'rxjs';
 
 
 @Component({
@@ -11,10 +12,11 @@ import { SharedService } from '../service/shared.service';
   templateUrl: './percentage-calculator.component.html',
   styleUrl: './percentage-calculator.component.scss'
 })
-export class PercentageCalculatorComponent {
+export class PercentageCalculatorComponent implements OnDestroy {
   selectedUnit: string;
   personalRecord: number;
   percentages: any[];
+  selectedPRSubscription: Subscription;
 
   constructor(private sharedService: SharedService) {
     this.selectedUnit = 'lbs';
@@ -35,6 +37,18 @@ export class PercentageCalculatorComponent {
       {percentageName: '55%', percentageValue: 55, percentageWeight: 0, unit: this.selectedUnit},
       {percentageName: '50%', percentageValue: 50, percentageWeight: 0, unit: this.selectedUnit},
     ];
+
+    this.selectedPRSubscription = this.sharedService.getSelectedPREvent().subscribe( pr => this.setSelectedPR(pr) );
+  }
+
+  ngOnDestroy(): void {
+      this.selectedPRSubscription.unsubscribe();
+  }
+
+  setSelectedPR(pr: any) {
+    this.personalRecord = pr.record;
+    this.selectedUnit = pr.recordUnit;
+    this.calculate();
   }
 
   calculate() {
@@ -48,7 +62,10 @@ export class PercentageCalculatorComponent {
   }
 
   calculatePercentages(personalRecord: number) {
-    this.percentages.map( p => p.percentageWeight = personalRecord * (p.percentageValue / 100));
+    this.percentages.map( p => {
+      p.percentageWeight = personalRecord * (p.percentageValue / 100);
+      p.unit = this.selectedUnit;
+    });
     return this.percentages;
   }
 }
