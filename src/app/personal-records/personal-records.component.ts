@@ -1,10 +1,10 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { NewPrComponent } from '../new-pr/new-pr.component';
 import { SharedService } from '../service/shared.service';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { LocalStorageService } from '../service/local-storage.service';
 import { LSKeysEnum } from '../enums/LSKeysEnum';
+import { NewPrComponent } from './new-pr/new-pr.component';
 
 @Component({
   selector: 'app-personal-records',
@@ -42,6 +42,12 @@ export class PersonalRecordsComponent implements OnDestroy, OnInit {
 
   addNewPR() {
     this.showNewPR = true;
+  }
+
+  deletePR(pr: any) {
+    const newPR = this.personalRecords.filter( (p: any) => p !== pr);
+    this.lsService.setItem(LSKeysEnum.PERSONAL_RECORDS, JSON.stringify(newPR));
+    this.loadPersonalRecords();
   }
 
   loadPersonalRecords() {

@@ -1,9 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { SharedService } from '../service/shared.service';
-import { LocalStorageService } from '../service/local-storage.service';
-import { LSKeysEnum } from '../enums/LSKeysEnum';
+import { SharedService } from '../../service/shared.service';
+import { LocalStorageService } from '../../service/local-storage.service';
+import { LSKeysEnum } from '../../enums/LSKeysEnum';
 
 @Component({
   selector: 'app-new-pr',

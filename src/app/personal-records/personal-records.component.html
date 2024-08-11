@@ -3,8 +3,13 @@
     <app-new-pr *ngIf="showNewPR"></app-new-pr>
     <div *ngIf="!showNewPR && personalRecords.length > 0">
         <ul>
-            <li *ngFor="let p of personalRecords"> <strong>{{ p.recordName }}: </strong> <a href="#" (click)="sendToPercentageCalculator($event, p)"> {{ p.record }}
-                {{p.recordUnit}} </a> </li>
+            <li *ngFor="let p of personalRecords"> 
+                <strong>{{ p.recordName }}: </strong> 
+                <a href="#"
+                    (click)="sendToPercentageCalculator($event, p)"> {{ p.record }}
+                    {{p.recordUnit}}</a>&nbsp;
+                <button class="btn btn-danger" (click)="deletePR(p)">Borrar</button>
+            </li>
         </ul>
     </div>
     <div class="form-group button-group" *ngIf="!showNewPR">
