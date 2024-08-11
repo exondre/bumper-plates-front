@@ -107,7 +107,8 @@
         "deploy": {
           "builder": "angular-cli-ghpages:deploy",
           "options": {
-            "cname": "bumperplates.eagmarmol.cl"
+            "cname": "bumperplates.eagmarmol.cl",
+            "repo": "https://github.com/exondre/bumper-plates-front.git"
           }
         }
       }
