@@ -1,6 +1,6 @@
 {
   "configVersion": 1,
-  "timestamp": 1721098861578,
+  "timestamp": 1723340750627,
   "index": "/index.html",
   "assetGroups": [
     {
@@ -13,7 +13,7 @@
       "urls": [
         "/favicon.ico",
         "/index.html",
-        "/main-QQLKA2ZE.js",
+        "/main-H46RHBVA.js",
         "/manifest.webmanifest",
         "/polyfills-6EAL64PA.js",
         "/styles-5INURTSO.css"
@@ -57,8 +57,8 @@
     "/assets/icons/old_icon-512x512.png": "1de182f76f7329dfa8f9fcdd1fdcdd695bea6a99",
     "/assets/kandor.jpeg": "dbcd5f6905bb6ee2679babaf69afeb7214f9fffc",
     "/favicon.ico": "84208af9b67c402ac993576c03f155933b17b598",
-    "/index.html": "790c29faa72eed6ddeac809af529c1c2fd65c5f1",
-    "/main-QQLKA2ZE.js": "c73468c9cd71dd6ee757a4614e272e5a784a2219",
+    "/index.html": "ba13d812f18b2e9e99ed496a16d6d80b98fd9965",
+    "/main-H46RHBVA.js": "1a59e6eff767eacd43687e415767372799e01c18",
     "/manifest.webmanifest": "75571fb7a057154726cde71a2141a66350cf77c0",
     "/polyfills-6EAL64PA.js": "d874147a12a6570d9b44e99935e9de8b7f3cabbc",
     "/styles-5INURTSO.css": "da39a3ee5e6b4b0d3255bfef95601890afd80709"
