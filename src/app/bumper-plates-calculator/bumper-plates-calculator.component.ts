@@ -68,17 +68,19 @@ export class BumperPlatesCalculatorComponent implements OnDestroy {
    * @returns {object} An object containing the necessary bumpers, the achieved weight, and the extra weight.
    */
   calculateBumpers(initialWeight: number, initialUnit:string , desiredWeight: number, desiredUnit: string) {
-    const availableBumpers = [
-      { bumperName: '45 lbs', bumperUnit: 'lbs', bumperValue: 45 },
-      { bumperName: '35 lbs', bumperUnit: 'lbs', bumperValue: 35 },
-      { bumperName: '25 lbs', bumperUnit: 'lbs', bumperValue: 25 },
-      { bumperName: '15 lbs', bumperUnit: 'lbs', bumperValue: 15 },
-      { bumperName: '10 lbs', bumperUnit: 'lbs', bumperValue: 10 },
-      { bumperName: '2.5 kg', bumperUnit: 'kg', bumperValue: 2.5 },
-      { bumperName: '2 kg', bumperUnit: 'kg', bumperValue: 2 },
-      { bumperName: '1.5 kg', bumperUnit: 'kg', bumperValue: 1.5 },
-      { bumperName: '1 kg', bumperUnit: 'kg', bumperValue: 1 },
-      { bumperName: '0.5 kg', bumperUnit: 'kg', bumperValue: 0.5 },
+    let availableBumpers = [
+      { bumperName: '10 kg', bumperUnit: 'kg', bumperOriginalUnit: 'kg', bumperValue: 10, bumperLimit: 1},
+      { bumperName: '5 kg', bumperUnit: 'kg', bumperOriginalUnit: 'kg', bumperValue: 5, bumperLimit: 2},
+      { bumperName: '45 lbs', bumperUnit: 'lbs', bumperOriginalUnit: 'lbs', bumperValue: 45, bumperLimit: 0},
+      { bumperName: '35 lbs', bumperUnit: 'lbs', bumperOriginalUnit: 'lbs', bumperValue: 35, bumperLimit: 0},
+      { bumperName: '25 lbs', bumperUnit: 'lbs', bumperOriginalUnit: 'lbs', bumperValue: 25, bumperLimit: 0},
+      { bumperName: '15 lbs', bumperUnit: 'lbs', bumperOriginalUnit: 'lbs', bumperValue: 15, bumperLimit: 0},
+      { bumperName: '10 lbs', bumperUnit: 'lbs', bumperOriginalUnit: 'lbs', bumperValue: 10, bumperLimit: 0},
+      { bumperName: '2.5 kg', bumperUnit: 'kg', bumperOriginalUnit: 'kg', bumperValue: 2.5, bumperLimit: 0},
+      { bumperName: '2 kg', bumperUnit: 'kg', bumperOriginalUnit: 'kg', bumperValue: 2, bumperLimit: 0},
+      { bumperName: '1.5 kg', bumperUnit: 'kg', bumperOriginalUnit: 'kg', bumperValue: 1.5, bumperLimit: 0},
+      { bumperName: '1 kg', bumperUnit: 'kg', bumperOriginalUnit: 'kg', bumperValue: 1, bumperLimit: 0},
+      { bumperName: '0.5 kg', bumperUnit: 'kg', bumperOriginalUnit: 'kg', bumperValue: 0.5, bumperLimit: 0},
     ];
 
     const poundToKiloFactor = 0.453592;
@@ -91,6 +93,9 @@ export class BumperPlatesCalculatorComponent implements OnDestroy {
     // Convert the desired weight to the same unit as the barbell
     if (desiredUnit === 'lbs') {
       desiredWeight *= poundToKiloFactor; // Convert to kilograms
+
+      // Filter out bigger bumpers measured in kilograms
+      availableBumpers = availableBumpers.filter((bumper) => bumper.bumperOriginalUnit === 'lbs' || bumper.bumperOriginalUnit === 'kg' && bumper.bumperValue < 5);
     }
 
     // Calculate the total desired weight
@@ -111,7 +116,18 @@ export class BumperPlatesCalculatorComponent implements OnDestroy {
     const tolerance = 0.5; // Define a tolerance of 1 kilogram
 
     // Sort the available bumpers in descending order of weight
-    availableBumpers.sort((a, b) => b.bumperValue - a.bumperValue);
+    availableBumpers.sort((a, b) => {
+      if (a.bumperOriginalUnit === 'kg' && a.bumperValue >= 5 && b.bumperOriginalUnit === 'kg' && b.bumperValue >= 5) {
+        return b.bumperValue - a.bumperValue;
+      }
+      if (a.bumperOriginalUnit === 'kg' && a.bumperValue >= 5 && b.bumperOriginalUnit === 'lbs') {
+        return -1; // a takes precedence
+      }
+      if (b.bumperOriginalUnit === 'kg' && b.bumperValue >= 5 && a.bumperOriginalUnit === 'lbs') {
+        return 1; // b takes precedence
+      }
+      return b.bumperValue - a.bumperValue; // Sort by bumperValue in descending order
+    });
 
     // Iterate over the available bumpers
     for (let bumper of availableBumpers) {
@@ -122,7 +138,17 @@ export class BumperPlatesCalculatorComponent implements OnDestroy {
       if (quantity * bumper.bumperValue - remainingWeight > tolerance) {
         // If it exceeds the tolerance, subtract 1 from the quantity
         quantity -= 1;
+      } 
+      
+      if (bumper.bumperLimit > 0 && quantity > bumper.bumperLimit) {
+        // If the quantity exceeds the limit, set it to the limit
+
+        console.log('got here');
+        console.log(quantity);
+        
+        quantity = bumper.bumperLimit;
       }
+
       // Add bumpers to the list
       if (quantity > 0) {
         requiredBumpers.push({ ...bumper, quantity });
