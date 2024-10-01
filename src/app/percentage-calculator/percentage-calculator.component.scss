@@ -11,14 +11,23 @@ h2 {
     .input-group {
         display: flex;
         align-items: stretch;
-        
+
         *:not(:first-child) {
             margin-left: 5px;
         }
     }
 
     &.button-group {
+        flex-direction: row;
+        display: flex;
+        align-items: stretch;
+        flex-wrap: nowrap;
+        justify-content: space-between;
         margin-top: 10px;
+
+        button {
+            width: 48%;
+        }
     }
 
 }

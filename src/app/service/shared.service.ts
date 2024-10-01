@@ -11,6 +11,9 @@ export class SharedService {
   private reloadPR = new Subject<boolean>();
   private selectedPR = new Subject<any>();
 
+  readonly poundToKiloFactor = 0.453592;
+  readonly kiloToPoundFactor = 2.20462;
+
   sendSelectedPercentageEvent(data: any) {
     this.selectedPercentage.next(data);
   }

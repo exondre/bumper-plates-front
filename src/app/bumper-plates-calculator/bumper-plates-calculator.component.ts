@@ -40,7 +40,7 @@ export class BumperPlatesCalculatorComponent implements OnDestroy {
   }
 
   ngOnDestroy(): void {
-      this.selectedPercentageSuscription.unsubscribe();
+    this.selectedPercentageSuscription.unsubscribe();
   }
 
   calculate() {
@@ -67,32 +67,31 @@ export class BumperPlatesCalculatorComponent implements OnDestroy {
    * @param {string} desiredUnit - The unit of desired weight, either 'kg' for kilograms or 'lbs' for pounds.
    * @returns {object} An object containing the necessary bumpers, the achieved weight, and the extra weight.
    */
-  calculateBumpers(initialWeight: number, initialUnit:string , desiredWeight: number, desiredUnit: string) {
+  calculateBumpers(initialWeight: number, initialUnit: string, desiredWeight: number, desiredUnit: string) {
     let availableBumpers = [
-      { bumperName: '10 kg', bumperUnit: 'kg', bumperOriginalUnit: 'kg', bumperValue: 10, bumperLimit: 1},
-      { bumperName: '5 kg', bumperUnit: 'kg', bumperOriginalUnit: 'kg', bumperValue: 5, bumperLimit: 2},
-      { bumperName: '45 lbs', bumperUnit: 'lbs', bumperOriginalUnit: 'lbs', bumperValue: 45, bumperLimit: 0},
-      { bumperName: '35 lbs', bumperUnit: 'lbs', bumperOriginalUnit: 'lbs', bumperValue: 35, bumperLimit: 0},
-      { bumperName: '25 lbs', bumperUnit: 'lbs', bumperOriginalUnit: 'lbs', bumperValue: 25, bumperLimit: 0},
-      { bumperName: '15 lbs', bumperUnit: 'lbs', bumperOriginalUnit: 'lbs', bumperValue: 15, bumperLimit: 0},
-      { bumperName: '10 lbs', bumperUnit: 'lbs', bumperOriginalUnit: 'lbs', bumperValue: 10, bumperLimit: 0},
-      { bumperName: '2.5 kg', bumperUnit: 'kg', bumperOriginalUnit: 'kg', bumperValue: 2.5, bumperLimit: 0},
-      { bumperName: '2 kg', bumperUnit: 'kg', bumperOriginalUnit: 'kg', bumperValue: 2, bumperLimit: 0},
-      { bumperName: '1.5 kg', bumperUnit: 'kg', bumperOriginalUnit: 'kg', bumperValue: 1.5, bumperLimit: 0},
-      { bumperName: '1 kg', bumperUnit: 'kg', bumperOriginalUnit: 'kg', bumperValue: 1, bumperLimit: 0},
-      { bumperName: '0.5 kg', bumperUnit: 'kg', bumperOriginalUnit: 'kg', bumperValue: 0.5, bumperLimit: 0},
+      { bumperName: '20 kg', bumperUnit: 'kg', bumperOriginalUnit: 'kg', bumperValue: 20, bumperLimit: 1 },
+      { bumperName: '15 kg', bumperUnit: 'kg', bumperOriginalUnit: 'kg', bumperValue: 15, bumperLimit: 1 },
+      { bumperName: '10 kg', bumperUnit: 'kg', bumperOriginalUnit: 'kg', bumperValue: 10, bumperLimit: 1 },
+      { bumperName: '5 kg', bumperUnit: 'kg', bumperOriginalUnit: 'kg', bumperValue: 5, bumperLimit: 2 },
+      { bumperName: '45 lbs', bumperUnit: 'lbs', bumperOriginalUnit: 'lbs', bumperValue: 45, bumperLimit: 0 },
+      { bumperName: '35 lbs', bumperUnit: 'lbs', bumperOriginalUnit: 'lbs', bumperValue: 35, bumperLimit: 0 },
+      { bumperName: '25 lbs', bumperUnit: 'lbs', bumperOriginalUnit: 'lbs', bumperValue: 25, bumperLimit: 0 },
+      { bumperName: '15 lbs', bumperUnit: 'lbs', bumperOriginalUnit: 'lbs', bumperValue: 15, bumperLimit: 0 },
+      { bumperName: '10 lbs', bumperUnit: 'lbs', bumperOriginalUnit: 'lbs', bumperValue: 10, bumperLimit: 0 },
+      { bumperName: '2.5 kg', bumperUnit: 'kg', bumperOriginalUnit: 'kg', bumperValue: 2.5, bumperLimit: 0 },
+      { bumperName: '2 kg', bumperUnit: 'kg', bumperOriginalUnit: 'kg', bumperValue: 2, bumperLimit: 0 },
+      { bumperName: '1.5 kg', bumperUnit: 'kg', bumperOriginalUnit: 'kg', bumperValue: 1.5, bumperLimit: 0 },
+      { bumperName: '1 kg', bumperUnit: 'kg', bumperOriginalUnit: 'kg', bumperValue: 1, bumperLimit: 0 },
+      { bumperName: '0.5 kg', bumperUnit: 'kg', bumperOriginalUnit: 'kg', bumperValue: 0.5, bumperLimit: 0 },
     ];
 
-    const poundToKiloFactor = 0.453592;
-    const kiloToPoundFactor = 2.20462;
-
     if (initialUnit === 'lbs') {
-      initialWeight *= poundToKiloFactor; // Convert to kilograms
+      initialWeight *= this.sharedService.poundToKiloFactor; // Convert to kilograms
     }
 
     // Convert the desired weight to the same unit as the barbell
     if (desiredUnit === 'lbs') {
-      desiredWeight *= poundToKiloFactor; // Convert to kilograms
+      desiredWeight *= this.sharedService.poundToKiloFactor; // Convert to kilograms
 
       // Filter out bigger bumpers measured in kilograms
       availableBumpers = availableBumpers.filter((bumper) => bumper.bumperOriginalUnit === 'lbs' || bumper.bumperOriginalUnit === 'kg' && bumper.bumperValue < 5);
@@ -104,7 +103,7 @@ export class BumperPlatesCalculatorComponent implements OnDestroy {
     // Convert the bumper values to kilograms if the unit is in pounds
     availableBumpers.forEach((bumper) => {
       if (bumper.bumperUnit === 'lbs') {
-        bumper.bumperValue *= poundToKiloFactor;
+        bumper.bumperValue *= this.sharedService.poundToKiloFactor;
         bumper.bumperUnit = 'kg';
       }
     });
@@ -138,14 +137,14 @@ export class BumperPlatesCalculatorComponent implements OnDestroy {
       if (quantity * bumper.bumperValue - remainingWeight > tolerance) {
         // If it exceeds the tolerance, subtract 1 from the quantity
         quantity -= 1;
-      } 
-      
+      }
+
       if (bumper.bumperLimit > 0 && quantity > bumper.bumperLimit) {
         // If the quantity exceeds the limit, set it to the limit
 
         console.log('got here');
         console.log(quantity);
-        
+
         quantity = bumper.bumperLimit;
       }
 
@@ -166,7 +165,7 @@ export class BumperPlatesCalculatorComponent implements OnDestroy {
       requiredBumpers,
       achievedWeight:
         desiredUnit === 'lbs'
-          ? totalAchievedWeight * kiloToPoundFactor
+          ? totalAchievedWeight * this.sharedService.kiloToPoundFactor
           : totalAchievedWeight,
       extraWeight: remainingWeight * -1,
     };

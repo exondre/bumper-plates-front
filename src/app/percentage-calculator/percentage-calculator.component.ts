@@ -68,4 +68,17 @@ export class PercentageCalculatorComponent implements OnDestroy {
     });
     return this.percentages;
   }
+
+  /**
+   * Switches the unit of measurement for the personal record between pounds (lbs) and kilograms (kg).
+   * 
+   * This method toggles the `selectedUnit` property between 'lbs' and 'kg'. It also updates the 
+   * `personalRecord` property by converting its value using the appropriate conversion factor 
+   * from the `sharedService`. Finally, it calls the `calculate` method to update any dependent calculations.
+   */
+  switchUnit() {
+    this.personalRecord = this.selectedUnit === 'lbs' ? Math.round(this.personalRecord * this.sharedService.poundToKiloFactor) : Math.round(this.personalRecord * this.sharedService.kiloToPoundFactor);
+    this.selectedUnit = this.selectedUnit === 'lbs' ? 'kg' : 'lbs';
+    this.calculate();
+  }
 }
