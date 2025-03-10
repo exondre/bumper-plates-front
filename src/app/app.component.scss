@@ -40,6 +40,13 @@
     .logo {
         display: grid;
         justify-content: center;
+        margin: -10px 0px;
+
+        img {
+            object-fit: contain;
+            width: 256px;
+            height: 256px;
+        }
     }
 
     .divider {
