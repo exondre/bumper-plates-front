@@ -69,6 +69,7 @@ export class BumperPlatesCalculatorComponent implements OnDestroy {
    */
   calculateBumpers(initialWeight: number, initialUnit: string, desiredWeight: number, desiredUnit: string) {
     let availableBumpers = [
+      { bumperName: '25 kg', bumperUnit: 'kg', bumperOriginalUnit: 'kg', bumperValue: 25, bumperLimit: 1 },
       { bumperName: '20 kg', bumperUnit: 'kg', bumperOriginalUnit: 'kg', bumperValue: 20, bumperLimit: 1 },
       { bumperName: '15 kg', bumperUnit: 'kg', bumperOriginalUnit: 'kg', bumperValue: 15, bumperLimit: 1 },
       { bumperName: '10 kg', bumperUnit: 'kg', bumperOriginalUnit: 'kg', bumperValue: 10, bumperLimit: 1 },
