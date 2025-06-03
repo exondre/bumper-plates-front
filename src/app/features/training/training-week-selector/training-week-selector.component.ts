@@ -1,6 +1,4 @@
-import {
-  Component,
-} from '@angular/core';
+import { Component } from '@angular/core';
 import {
   TrainingExercise,
   TrainingSession,
@@ -11,10 +9,11 @@ import { PersonalRecord } from '../../../personal-records/personal-record.interf
 import { LSKeysEnum } from '../../../shared/enums/LSKeysEnum';
 import { ExerciseEnum } from '../../../shared/enums/ExerciseEnum';
 import { BumperPlatesCalculatorComponent } from '../../../bumper-plates-calculator/bumper-plates-calculator.component';
+import { TrainingCsvLoaderComponent } from '../training-csv-loader/training-csv-loader.component';
 
 @Component({
   selector: 'app-training-week-selector',
-  imports: [BumperPlatesCalculatorComponent],
+  imports: [BumperPlatesCalculatorComponent, TrainingCsvLoaderComponent],
   templateUrl: './training-week-selector.component.html',
   styleUrl: './training-week-selector.component.scss',
 })
@@ -61,7 +60,11 @@ export class TrainingWeekSelectorComponent {
   }
 
   openCalculatorForSet(exercise: TrainingExercise, set: TrainingSet) {
-    this.selectedCalculator = { exercise, set };
+    this.closeCalculator();
+
+    setTimeout(() => {
+      this.selectedCalculator = { exercise, set };
+    });
   }
 
   closeCalculator() {
