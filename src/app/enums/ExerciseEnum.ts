@@ -1,0 +1,7 @@
+export enum ExerciseEnum {
+  SNATCH = 'SNATCH',
+  CLEAN_AND_JERK = 'CLEAN_AND_JERK',
+  FRONT_SQUAT = 'FRONT_SQUAT',
+  BACK_SQUAT = 'BACK_SQUAT',
+  NONE = 'NONE',
+}

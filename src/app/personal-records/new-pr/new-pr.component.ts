@@ -4,28 +4,50 @@ import { FormsModule } from '@angular/forms';
 import { SharedService } from '../../service/shared.service';
 import { LocalStorageService } from '../../service/local-storage.service';
 import { LSKeysEnum } from '../../enums/LSKeysEnum';
+import { PersonalRecord } from '../personal-record.interface';
+import { ExerciseEnum } from '../../enums/ExerciseEnum';
+import { ExerciseLabelPipe } from '../../shared/pipes/exercise-label.pipe';
 
 @Component({
   selector: 'app-new-pr',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, ExerciseLabelPipe, FormsModule],
   templateUrl: './new-pr.component.html',
-  styleUrl: './new-pr.component.scss'
+  styleUrl: './new-pr.component.scss',
 })
 export class NewPrComponent {
   weightRecord: number = 0;
   weightRecordName: string = '';
   weightRecordUnit: string = 'kg';
+  recordExcerciseType: ExerciseEnum = ExerciseEnum.NONE;
 
-  constructor(private sharedService: SharedService, private localStorageService: LocalStorageService) {}
+  ExerciseEnum = ExerciseEnum;
+  exerciseTypes: string[] = Object.values(ExerciseEnum);
+
+  constructor(
+    private sharedService: SharedService,
+    private localStorageService: LocalStorageService
+  ) {}
 
   saveNewRecord() {
-    const personalRecords = JSON.parse(this.localStorageService.getItem(LSKeysEnum.PERSONAL_RECORDS)) ?? [];
+    const personalRecords =
+      JSON.parse(
+        this.localStorageService.getItem(LSKeysEnum.PERSONAL_RECORDS)
+      ) ?? [];
 
-    const newPR = {recordName: this.weightRecordName, record: this.weightRecord, recordUnit: this.weightRecordUnit};
+    const newPR: PersonalRecord = {
+      recordName: this.weightRecordName,
+      record: this.weightRecord,
+      recordUnit: this.weightRecordUnit,
+      exerciseType: this.recordExcerciseType,
+      date: new Date(),
+    };
     personalRecords.push(newPR);
 
-    this.localStorageService.setItem(LSKeysEnum.PERSONAL_RECORDS, JSON.stringify(personalRecords));
+    this.localStorageService.setItem(
+      LSKeysEnum.PERSONAL_RECORDS,
+      JSON.stringify(personalRecords)
+    );
     this.sharedService.sendReloadPR();
     this.cancelNewRecord();
   }
@@ -36,9 +58,8 @@ export class NewPrComponent {
   }
 
   private setDefaultValues() {
-    this.weightRecord = 0; 
+    this.weightRecord = 0;
     this.weightRecordName = '';
     this.weightRecordUnit = 'kg';
   }
-
 }
