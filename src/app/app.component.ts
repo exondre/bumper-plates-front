@@ -4,12 +4,11 @@ import { RouterOutlet } from '@angular/router';
 import { BumperPlatesCalculatorComponent } from './bumper-plates-calculator/bumper-plates-calculator.component';
 import { PercentageCalculatorComponent } from './percentage-calculator/percentage-calculator.component';
 import { PersonalRecordsComponent } from './personal-records/personal-records.component';
-import { TrainingCsvLoaderComponent } from "./features/training/training-csv-loader/training-csv-loader.component";
 import { TrainingWeekSelectorComponent } from "./features/training/training-week-selector/training-week-selector.component";
 
 @Component({
     selector: 'app-root',
-    imports: [CommonModule, RouterOutlet, BumperPlatesCalculatorComponent, PercentageCalculatorComponent, PersonalRecordsComponent, TrainingCsvLoaderComponent, TrainingWeekSelectorComponent],
+    imports: [CommonModule, RouterOutlet, BumperPlatesCalculatorComponent, PercentageCalculatorComponent, PersonalRecordsComponent, TrainingWeekSelectorComponent],
     templateUrl: './app.component.html',
     styleUrl: './app.component.scss'
 })

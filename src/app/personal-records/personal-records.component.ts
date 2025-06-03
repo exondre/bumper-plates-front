@@ -5,6 +5,7 @@ import { Subscription } from 'rxjs';
 import { LocalStorageService } from '../service/local-storage.service';
 import { LSKeysEnum } from '../shared/enums/LSKeysEnum';
 import { NewPrComponent } from './new-pr/new-pr.component';
+import { PersonalRecord } from './personal-record.interface';
 
 @Component({
     selector: 'app-personal-records',
@@ -13,7 +14,7 @@ import { NewPrComponent } from './new-pr/new-pr.component';
     styleUrl: './personal-records.component.scss'
 })
 export class PersonalRecordsComponent implements OnDestroy, OnInit {
-  personalRecords: any[] = [];
+  personalRecords: PersonalRecord[] = [];
   showNewPR: boolean = false;
   showNewPRSubscription: Subscription;
   reloadPRSubscription: Subscription;

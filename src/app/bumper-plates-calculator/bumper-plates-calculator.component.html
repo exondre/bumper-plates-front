@@ -1,41 +1,62 @@
 <div class="container">
   @if (!externalInputMode) {
   <h2>Calculadora de discos</h2>
+  <!-- INITIAL WEIGHT -->
   <div class="form-group">
-    <label for="initialWeight">Peso de la barra o el total cargado: </label>
+    <label for="initialWeight" class="form-label">Peso de la barra o el total cargado: </label>
     <div class="input-group">
-      <input type="number" class="form-control" id="initialWeight" [(ngModel)]="initialWeight" name="initialWeight">
-      <label for="initialWeightUnit"> </label>
-      <select id="initialWeightUnit" [(ngModel)]="initialWeightUnit">
+      <input type="number" class="form-control w-75" id="initialWeight" [(ngModel)]="initialWeight" name="initialWeight">
+      <select id="initialWeightUnit" class="form-select w-25" [(ngModel)]="initialWeightUnit">
         <option value="lbs">lbs</option>
         <option value="kg">kg</option>
       </select>
     </div>
   </div>
-  <div class="form-group">
-    <label for="desiredWeight">Peso deseado: </label>
+
+  <!-- DESIRED WEIGHT -->
+  <div class="form-group mt-2">
+    <label for="desiredWeight" class="form-label">Peso deseado: </label>
     <div class="input-group">
-      <input type="number" class="form-control" id="desiredWeight" [(ngModel)]="desiredWeight" name="desiredWeight">
-      <label for="desiredWeightUnit"> </label>
-      <select id="desiredWeightUnit" [(ngModel)]="desiredWeightUnit">
+      <input type="number" class="form-control w-75" id="desiredWeight" [(ngModel)]="desiredWeight" name="desiredWeight">
+      <select id="desiredWeightUnit" class="form-select w-25" [(ngModel)]="desiredWeightUnit">
         <option value="lbs">lbs</option>
         <option value="kg">kg</option>
       </select>
     </div>
   </div>
+
   <div class="form-group button-group">
     <button class="btn btn-primary" (click)="calculate()">Calcular</button>
-    <button class="btn btn-primary" (click)="switchDesiredToInitial()">1, 2... Switch!</button>
+    <button class="btn btn-outline-secondary" (click)="switchDesiredToInitial()">1, 2... Switch!</button>
   </div>
   }
   @if (requiredBumpers.length > 0) {
-  <div>
-    <h2>Discos a cargar:</h2>
-    <ul>
-      <li *ngFor="let bumper of requiredBumpers">{{ bumper.bumperName }} ({{ bumper.quantity }})</li>
-    </ul>
-    <p>Peso alcanzado: {{ achievedWeight | number:'1.2-2' }} {{ desiredWeightUnit }}</p>
-    <p>Peso extra: {{ extraWeight | number:'1.2-2' }} {{ desiredWeightUnit }}</p>
+  <div class="card my-4 shadow position-relative">
+  <div class="card-header bg-primary text-white">
+    <h5 class="mb-0">Discos a cargar</h5>
+    @if (externalInputMode) {
+    <button type="button"
+      class="btn-close btn-close-custom position-absolute top-0 end-0 m-2"
+      aria-label="Cerrar"
+      (click)="close()"></button>
+    }
   </div>
+  <div class="card-body">
+    <ul class="list-group list-group-flush mb-1">
+      <li class="list-group-item" *ngFor="let bumper of requiredBumpers">
+        <strong>{{ bumper.bumperName }}</strong>
+        <span class="badge bg-primary ms-2">{{ bumper.quantity }}</span>
+      </li>
+    </ul>
+    <p class="mb-1">
+      <strong>Peso alcanzado:</strong>
+      <span class="text-success ms-1">{{ achievedWeight | number:'1.1-1' }} {{ desiredWeightUnit }}</span>
+    </p>
+    <p class="mb-0">
+      <strong>Peso extra:</strong>
+      <span class="text-danger ms-1">{{ extraWeight | number:'1.2-2' }} {{ desiredWeightUnit }}</span>
+    </p>
+  </div>
+</div>
   }
 </div>

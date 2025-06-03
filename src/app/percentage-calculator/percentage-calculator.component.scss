@@ -1,33 +1,37 @@
 h2 {
-    margin-block-start: auto;
-    margin-block-end: auto;
+  margin-block-start: auto;
+  margin-block-end: auto;
 }
 
 .form-group {
+  display: flex;
+  align-items: stretch;
+  flex-direction: column;
+
+  .input-group {
     display: flex;
     align-items: stretch;
-    flex-direction: column;
 
-    .input-group {
-        display: flex;
-        align-items: stretch;
-
-        *:not(:first-child) {
-            margin-left: 5px;
-        }
+    *:not(:first-child) {
+      margin-left: 5px;
     }
+  }
 
-    &.button-group {
-        flex-direction: row;
-        display: flex;
-        align-items: stretch;
-        flex-wrap: nowrap;
-        justify-content: space-between;
-        margin-top: 10px;
+  &.button-group {
+    flex-direction: row;
+    display: flex;
+    align-items: stretch;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    margin-top: 10px;
 
-        button {
-            width: 48%;
-        }
+    button {
+      width: 48%;
     }
+  }
+}
 
+.list-group-item {
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
 }

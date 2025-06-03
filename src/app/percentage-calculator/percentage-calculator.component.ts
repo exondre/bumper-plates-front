@@ -37,6 +37,8 @@ export class PercentageCalculatorComponent implements OnDestroy {
       {percentageName: '50%', percentageValue: 50, percentageWeight: 0, unit: this.selectedUnit},
     ];
 
+    this.percentages.sort((a, b) => a.percentageValue - b.percentageValue);
+
     this.selectedPRSubscription = this.sharedService.getSelectedPREvent().subscribe( pr => this.setSelectedPR(pr) );
   }
 
@@ -70,9 +72,9 @@ export class PercentageCalculatorComponent implements OnDestroy {
 
   /**
    * Switches the unit of measurement for the personal record between pounds (lbs) and kilograms (kg).
-   * 
-   * This method toggles the `selectedUnit` property between 'lbs' and 'kg'. It also updates the 
-   * `personalRecord` property by converting its value using the appropriate conversion factor 
+   *
+   * This method toggles the `selectedUnit` property between 'lbs' and 'kg'. It also updates the
+   * `personalRecord` property by converting its value using the appropriate conversion factor
    * from the `sharedService`. Finally, it calls the `calculate` method to update any dependent calculations.
    */
   switchUnit() {

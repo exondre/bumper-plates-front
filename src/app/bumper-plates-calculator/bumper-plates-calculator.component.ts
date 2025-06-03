@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, input, OnDestroy, OnInit } from '@angular/core';
+import { Component, input, OnDestroy, OnInit, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { SharedService } from '../service/shared.service';
@@ -16,6 +16,7 @@ export class BumperPlatesCalculatorComponent implements OnInit, OnDestroy {
   desiredWeightInput = input<number>();
   desiredWeightUnitInput = input<string>();
   externalInputModeInput = input<boolean>(false);
+  closedSignal = output<void>();
 
   externalInputMode: boolean = false;
   initialWeight: number;
@@ -55,10 +56,6 @@ export class BumperPlatesCalculatorComponent implements OnInit, OnDestroy {
       this.initialWeightUnit = this.initialWeightUnitInput()!;
       this.desiredWeight = this.desiredWeightInput()!;
       this.desiredWeightUnit = this.desiredWeightUnitInput()!;
-
-      console.debug('------->> Calculating with external inputs', this.initialWeight, this.initialWeightUnit, this.desiredWeight, this.desiredWeightUnit);
-
-
       this.calculate();
       this.selectedPercentageSuscription.unsubscribe();
     }
@@ -66,6 +63,10 @@ export class BumperPlatesCalculatorComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.selectedPercentageSuscription.unsubscribe();
+  }
+
+  close() {
+    this.closedSignal.emit();
   }
 
   calculate() {

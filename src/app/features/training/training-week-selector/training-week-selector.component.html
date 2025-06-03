@@ -38,17 +38,21 @@
       <li class="list-group-item">
         <strong>{{ ex.name }}</strong>
         @if (ex.sets && ex.sets.length > 0) {
-        <ul class="list-inline mb-0">
-          @for (set of ex.sets; track set.weightPercent) {
-          <li class="list-inline-item">
-            <button type="button" class="btn btn-outline-info btn-sm" (click)="openCalculatorForSet(ex, set)">
-              {{ set.weightPercent ? set.weightPercent + '%' : '' }} {{ set.reps }}
-            </button>
-          </li>
-          }
+        <ul class="list-inline mt-1">
+          <div class="d-flex flex-wrap flex-sm-row gap-2">
+            @for (set of ex.sets; track set.weightPercent) {
+
+            <li class="list-inline-item">
+              <button type="button" class="btn btn-outline-primary btn-sm" (click)="openCalculatorForSet(ex, set)">
+                {{ set.weightPercent ? set.weightPercent + '%' : '' }} {{ set.reps }}
+              </button>
+            </li>
+            }
+          </div>
         </ul>
+
         } @else {
-        <span class="badge bg-info text-dark">
+        <span class="badge bg-primary ms-2">
           {{ ex.repLibres }}
         </span>
         }
@@ -57,12 +61,11 @@
           @let exCalc = selectedCalculator?.exercise!;
           @let setCalc = selectedCalculator?.set!;
           @let pr = getPersonalRecordForType(exCalc.exerciseType!);
-          <app-bumper-plates-calculator [externalInputModeInput]="true" [initialWeightInput]="initialWeight"
-            [initialWeightUnitInput]="initialWeightUnit"
+          <app-bumper-plates-calculator (closedSignal)="closeCalculator()" [externalInputModeInput]="true"
+            [initialWeightInput]="initialWeight" [initialWeightUnitInput]="initialWeightUnit"
             [desiredWeightInput]="pr && setCalc?.weightPercent ? (pr?.record! * setCalc?.weightPercent! / 100) : pr?.record ?? 20"
             [desiredWeightUnitInput]="pr?.recordUnit ?? 'kg'">
           </app-bumper-plates-calculator>
-          <button class="btn btn-link btn-sm mt-1" (click)="closeCalculator()">Cerrar</button>
         </div>
         }
       </li>
