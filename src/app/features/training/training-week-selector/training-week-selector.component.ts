@@ -12,6 +12,7 @@ import { BumperPlatesCalculatorComponent } from '../../../bumper-plates-calculat
 import { TrainingCsvLoaderComponent } from '../training-csv-loader/training-csv-loader.component';
 import { TrainingService } from '../training.service';
 import { LocalStorageService } from '../../../service/local-storage.service';
+import { WeightUnitEnum } from '../../../shared/enums/weight-unit.enum';
 
 @Component({
   selector: 'app-training-week-selector',
@@ -26,6 +27,14 @@ export class TrainingWeekSelectorComponent {
 
   initialWeight: number = 20; // Peso inicial por defecto
   initialWeightUnit: string = 'kg'; // Unidad de peso por defecto
+
+  barbellList: {value: number; unit: WeightUnitEnum }[] = [
+    { value: 20, unit: WeightUnitEnum.KG },
+    { value: 15, unit: WeightUnitEnum.KG },
+    { value: 45, unit: WeightUnitEnum.LBS },
+    { value: 35, unit: WeightUnitEnum.LBS },
+  ];
+  selectedBarbell: {value: number; unit: string} | null = null;
 
   personalRecords: PersonalRecord[] = [];
   selectedCalculator: {
@@ -91,6 +100,11 @@ Si eliges no recuperar, podrás seguir usando la app, pero algunas funcionalidad
       return;
     }
     this.selectedSession = session;
+  }
+
+  selectBarbell(barbell: {value: number; unit: string}) {
+    this.selectedBarbell = barbell;
+    this.closeCalculator();
   }
 
   getPersonalRecordForType(

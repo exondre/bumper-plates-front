@@ -44,6 +44,18 @@
   }
 
   @if (selectedSession) {
+  <div class="d-flex flex-column mb-3">
+    <label for="barbellSelector" class="form-label">Recuerda seleccionar tu barra</label>
+    <div class="btn-group" role="group" aria-label="Barras">
+      @for (barbell of barbellList; track barbell.value) {
+      <button type="button" class="btn btn-outline-secondary btn-sm" [class.active]="selectedBarbell === barbell"
+        (click)="selectBarbell(barbell)">
+        {{ barbell.value }} {{ barbell.unit }}
+      </button>
+      }
+    </div>
+  </div>
+
   <div>
     <h6>Ejercicios de la sesión {{ selectedSession.sessionNumber }}</h6>
     <ul class="list-group">
@@ -73,7 +85,7 @@
           @let setCalc = selectedCalculator?.set!;
           @let pr = getPersonalRecordForType(exCalc.exerciseType!);
           <app-bumper-plates-calculator (closedSignal)="closeCalculator()" [externalInputModeInput]="true"
-            [initialWeightInput]="initialWeight" [initialWeightUnitInput]="initialWeightUnit"
+            [initialWeightInput]="selectedBarbell?.value" [initialWeightUnitInput]="selectedBarbell?.unit"
             [desiredWeightInput]="pr && setCalc?.weightPercent ? (pr?.record! * setCalc?.weightPercent! / 100) : pr?.record ?? 20"
             [desiredWeightUnitInput]="pr?.recordUnit ?? 'kg'">
           </app-bumper-plates-calculator>
