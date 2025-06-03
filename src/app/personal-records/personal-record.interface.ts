@@ -1,4 +1,4 @@
-import { ExerciseEnum } from '../enums/ExerciseEnum';
+import { ExerciseEnum } from '../shared/enums/ExerciseEnum';
 
 export interface PersonalRecord {
   recordName: string;

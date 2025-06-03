@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { ExerciseEnum } from '../../enums/ExerciseEnum';
-import { LSKeysEnum } from '../../enums/LSKeysEnum';
+import { ExerciseEnum } from '../../shared/enums/ExerciseEnum';
+import { LSKeysEnum } from '../../shared/enums/LSKeysEnum';
 import { LocalStorageService } from '../../service/local-storage.service';
 import { SharedService } from '../../service/shared.service';
 import { ExerciseLabelPipe } from '../../shared/pipes/exercise-label.pipe';

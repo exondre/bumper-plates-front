@@ -3,7 +3,7 @@ import { SharedService } from '../service/shared.service';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { LocalStorageService } from '../service/local-storage.service';
-import { LSKeysEnum } from '../enums/LSKeysEnum';
+import { LSKeysEnum } from '../shared/enums/LSKeysEnum';
 import { NewPrComponent } from './new-pr/new-pr.component';
 
 @Component({
