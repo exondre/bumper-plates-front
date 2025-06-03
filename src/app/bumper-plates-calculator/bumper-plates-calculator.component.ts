@@ -1,16 +1,23 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy } from '@angular/core';
+import { Component, input, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { SharedService } from '../service/shared.service';
 
 @Component({
-    selector: 'app-bumper-plates-calculator',
-    imports: [CommonModule, FormsModule],
-    templateUrl: './bumper-plates-calculator.component.html',
-    styleUrls: ['./bumper-plates-calculator.component.scss']
+  selector: 'app-bumper-plates-calculator',
+  imports: [CommonModule, FormsModule],
+  templateUrl: './bumper-plates-calculator.component.html',
+  styleUrls: ['./bumper-plates-calculator.component.scss'],
 })
-export class BumperPlatesCalculatorComponent implements OnDestroy {
+export class BumperPlatesCalculatorComponent implements OnInit, OnDestroy {
+  initialWeightInput = input<number>();
+  initialWeightUnitInput = input<string>();
+  desiredWeightInput = input<number>();
+  desiredWeightUnitInput = input<string>();
+  externalInputModeInput = input<boolean>(false);
+
+  externalInputMode: boolean = false;
   initialWeight: number;
   desiredWeight: number;
   requiredBumpers: any[];
@@ -29,13 +36,32 @@ export class BumperPlatesCalculatorComponent implements OnDestroy {
     this.initialWeightUnit = 'kg';
     this.desiredWeightUnit = 'lbs';
 
-    this.selectedPercentageSuscription = this.sharedService.getSelectedPercentageEvent().subscribe(p => {
-      // Perform actions based on the received data
-      // console.log(p);
-      this.desiredWeight = p.percentageWeight;
-      this.desiredWeightUnit = p.unit;
+    this.selectedPercentageSuscription = this.sharedService
+      .getSelectedPercentageEvent()
+      .subscribe((p) => {
+        // Perform actions based on the received data
+        // console.log(p);
+        this.desiredWeight = p.percentageWeight;
+        this.desiredWeightUnit = p.unit;
+        this.calculate();
+      });
+  }
+
+  ngOnInit(): void {
+    // If external input mode is enabled, calculate the initial values
+    this.externalInputMode = this.externalInputModeInput();
+    if (this.externalInputMode) {
+      this.initialWeight = this.initialWeightInput()!; // Default bar weight
+      this.initialWeightUnit = this.initialWeightUnitInput()!;
+      this.desiredWeight = this.desiredWeightInput()!;
+      this.desiredWeightUnit = this.desiredWeightUnitInput()!;
+
+      console.debug('------->> Calculating with external inputs', this.initialWeight, this.initialWeightUnit, this.desiredWeight, this.desiredWeightUnit);
+
+
       this.calculate();
-    });
+      this.selectedPercentageSuscription.unsubscribe();
+    }
   }
 
   ngOnDestroy(): void {
@@ -46,7 +72,12 @@ export class BumperPlatesCalculatorComponent implements OnDestroy {
     // Implement your calculation logic here
     // Assign values to bumpersNecessary, achievedWeight, and extraWeight
 
-    const result = this.calculateBumpers(this.initialWeight, this.initialWeightUnit, this.desiredWeight, this.desiredWeightUnit);
+    const result = this.calculateBumpers(
+      this.initialWeight,
+      this.initialWeightUnit,
+      this.desiredWeight,
+      this.desiredWeightUnit
+    );
     this.requiredBumpers = result.requiredBumpers;
     this.achievedWeight = result.achievedWeight;
     this.extraWeight = result.extraWeight;
@@ -66,23 +97,118 @@ export class BumperPlatesCalculatorComponent implements OnDestroy {
    * @param {string} desiredUnit - The unit of desired weight, either 'kg' for kilograms or 'lbs' for pounds.
    * @returns {object} An object containing the necessary bumpers, the achieved weight, and the extra weight.
    */
-  calculateBumpers(initialWeight: number, initialUnit: string, desiredWeight: number, desiredUnit: string) {
+  calculateBumpers(
+    initialWeight: number,
+    initialUnit: string,
+    desiredWeight: number,
+    desiredUnit: string
+  ) {
     let availableBumpers = [
-      { bumperName: '25 kg', bumperUnit: 'kg', bumperOriginalUnit: 'kg', bumperValue: 25, bumperLimit: 1 },
-      { bumperName: '20 kg', bumperUnit: 'kg', bumperOriginalUnit: 'kg', bumperValue: 20, bumperLimit: 1 },
-      { bumperName: '15 kg', bumperUnit: 'kg', bumperOriginalUnit: 'kg', bumperValue: 15, bumperLimit: 1 },
-      { bumperName: '10 kg', bumperUnit: 'kg', bumperOriginalUnit: 'kg', bumperValue: 10, bumperLimit: 1 },
-      { bumperName: '5 kg', bumperUnit: 'kg', bumperOriginalUnit: 'kg', bumperValue: 5, bumperLimit: 2 },
-      { bumperName: '45 lbs', bumperUnit: 'lbs', bumperOriginalUnit: 'lbs', bumperValue: 45, bumperLimit: 0 },
-      { bumperName: '35 lbs', bumperUnit: 'lbs', bumperOriginalUnit: 'lbs', bumperValue: 35, bumperLimit: 0 },
-      { bumperName: '25 lbs', bumperUnit: 'lbs', bumperOriginalUnit: 'lbs', bumperValue: 25, bumperLimit: 0 },
-      { bumperName: '15 lbs', bumperUnit: 'lbs', bumperOriginalUnit: 'lbs', bumperValue: 15, bumperLimit: 0 },
-      { bumperName: '10 lbs', bumperUnit: 'lbs', bumperOriginalUnit: 'lbs', bumperValue: 10, bumperLimit: 0 },
-      { bumperName: '2.5 kg', bumperUnit: 'kg', bumperOriginalUnit: 'kg', bumperValue: 2.5, bumperLimit: 0 },
-      { bumperName: '2 kg', bumperUnit: 'kg', bumperOriginalUnit: 'kg', bumperValue: 2, bumperLimit: 0 },
-      { bumperName: '1.5 kg', bumperUnit: 'kg', bumperOriginalUnit: 'kg', bumperValue: 1.5, bumperLimit: 0 },
-      { bumperName: '1 kg', bumperUnit: 'kg', bumperOriginalUnit: 'kg', bumperValue: 1, bumperLimit: 0 },
-      { bumperName: '0.5 kg', bumperUnit: 'kg', bumperOriginalUnit: 'kg', bumperValue: 0.5, bumperLimit: 0 },
+      {
+        bumperName: '25 kg',
+        bumperUnit: 'kg',
+        bumperOriginalUnit: 'kg',
+        bumperValue: 25,
+        bumperLimit: 1,
+      },
+      {
+        bumperName: '20 kg',
+        bumperUnit: 'kg',
+        bumperOriginalUnit: 'kg',
+        bumperValue: 20,
+        bumperLimit: 1,
+      },
+      {
+        bumperName: '15 kg',
+        bumperUnit: 'kg',
+        bumperOriginalUnit: 'kg',
+        bumperValue: 15,
+        bumperLimit: 1,
+      },
+      {
+        bumperName: '10 kg',
+        bumperUnit: 'kg',
+        bumperOriginalUnit: 'kg',
+        bumperValue: 10,
+        bumperLimit: 1,
+      },
+      {
+        bumperName: '5 kg',
+        bumperUnit: 'kg',
+        bumperOriginalUnit: 'kg',
+        bumperValue: 5,
+        bumperLimit: 2,
+      },
+      {
+        bumperName: '45 lbs',
+        bumperUnit: 'lbs',
+        bumperOriginalUnit: 'lbs',
+        bumperValue: 45,
+        bumperLimit: 0,
+      },
+      {
+        bumperName: '35 lbs',
+        bumperUnit: 'lbs',
+        bumperOriginalUnit: 'lbs',
+        bumperValue: 35,
+        bumperLimit: 0,
+      },
+      {
+        bumperName: '25 lbs',
+        bumperUnit: 'lbs',
+        bumperOriginalUnit: 'lbs',
+        bumperValue: 25,
+        bumperLimit: 0,
+      },
+      {
+        bumperName: '15 lbs',
+        bumperUnit: 'lbs',
+        bumperOriginalUnit: 'lbs',
+        bumperValue: 15,
+        bumperLimit: 0,
+      },
+      {
+        bumperName: '10 lbs',
+        bumperUnit: 'lbs',
+        bumperOriginalUnit: 'lbs',
+        bumperValue: 10,
+        bumperLimit: 0,
+      },
+      {
+        bumperName: '2.5 kg',
+        bumperUnit: 'kg',
+        bumperOriginalUnit: 'kg',
+        bumperValue: 2.5,
+        bumperLimit: 0,
+      },
+      {
+        bumperName: '2 kg',
+        bumperUnit: 'kg',
+        bumperOriginalUnit: 'kg',
+        bumperValue: 2,
+        bumperLimit: 0,
+      },
+      {
+        bumperName: '1.5 kg',
+        bumperUnit: 'kg',
+        bumperOriginalUnit: 'kg',
+        bumperValue: 1.5,
+        bumperLimit: 0,
+      },
+      {
+        bumperName: '1 kg',
+        bumperUnit: 'kg',
+        bumperOriginalUnit: 'kg',
+        bumperValue: 1,
+        bumperLimit: 0,
+      },
+      {
+        bumperName: '0.5 kg',
+        bumperUnit: 'kg',
+        bumperOriginalUnit: 'kg',
+        bumperValue: 0.5,
+        bumperLimit: 0,
+      },
     ];
 
     if (initialUnit === 'lbs') {
@@ -94,7 +220,11 @@ export class BumperPlatesCalculatorComponent implements OnDestroy {
       desiredWeight *= this.sharedService.poundToKiloFactor; // Convert to kilograms
 
       // Filter out bigger bumpers measured in kilograms
-      availableBumpers = availableBumpers.filter((bumper) => bumper.bumperOriginalUnit === 'lbs' || bumper.bumperOriginalUnit === 'kg' && bumper.bumperValue < 5);
+      availableBumpers = availableBumpers.filter(
+        (bumper) =>
+          bumper.bumperOriginalUnit === 'lbs' ||
+          (bumper.bumperOriginalUnit === 'kg' && bumper.bumperValue < 5)
+      );
     }
 
     // Calculate the total desired weight
@@ -116,13 +246,26 @@ export class BumperPlatesCalculatorComponent implements OnDestroy {
 
     // Sort the available bumpers in descending order of weight
     availableBumpers.sort((a, b) => {
-      if (a.bumperOriginalUnit === 'kg' && a.bumperValue >= 5 && b.bumperOriginalUnit === 'kg' && b.bumperValue >= 5) {
+      if (
+        a.bumperOriginalUnit === 'kg' &&
+        a.bumperValue >= 5 &&
+        b.bumperOriginalUnit === 'kg' &&
+        b.bumperValue >= 5
+      ) {
         return b.bumperValue - a.bumperValue;
       }
-      if (a.bumperOriginalUnit === 'kg' && a.bumperValue >= 5 && b.bumperOriginalUnit === 'lbs') {
+      if (
+        a.bumperOriginalUnit === 'kg' &&
+        a.bumperValue >= 5 &&
+        b.bumperOriginalUnit === 'lbs'
+      ) {
         return -1; // a takes precedence
       }
-      if (b.bumperOriginalUnit === 'kg' && b.bumperValue >= 5 && a.bumperOriginalUnit === 'lbs') {
+      if (
+        b.bumperOriginalUnit === 'kg' &&
+        b.bumperValue >= 5 &&
+        a.bumperOriginalUnit === 'lbs'
+      ) {
         return 1; // b takes precedence
       }
       return b.bumperValue - a.bumperValue; // Sort by bumperValue in descending order

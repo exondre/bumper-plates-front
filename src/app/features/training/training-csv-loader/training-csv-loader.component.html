@@ -1,0 +1,7 @@
+<h3>Cargar entrenamiento desde CSV</h3>
+<input type="file" (change)="onFileChange($event)" accept=".csv" />
+<br />
+<textarea [(ngModel)]="csvText" rows="10" placeholder="Pega aquí tu CSV"></textarea>
+<br />
+<button (click)="parse()">Parsear CSV</button>
+<pre *ngIf="trainingWeek">{{ trainingWeek | json }}</pre>
