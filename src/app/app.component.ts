@@ -6,11 +6,10 @@ import { PercentageCalculatorComponent } from './percentage-calculator/percentag
 import { PersonalRecordsComponent } from './personal-records/personal-records.component';
 
 @Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [CommonModule, RouterOutlet, BumperPlatesCalculatorComponent, PercentageCalculatorComponent, PersonalRecordsComponent],
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+    selector: 'app-root',
+    imports: [CommonModule, RouterOutlet, BumperPlatesCalculatorComponent, PercentageCalculatorComponent, PersonalRecordsComponent],
+    templateUrl: './app.component.html',
+    styleUrl: './app.component.scss'
 })
 export class AppComponent {
   title = 'Bienvenido a Bumper Plates';

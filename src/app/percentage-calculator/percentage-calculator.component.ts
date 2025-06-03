@@ -6,11 +6,10 @@ import { Subscription } from 'rxjs';
 
 
 @Component({
-  selector: 'app-percentage-calculator',
-  standalone: true,
-  imports: [CommonModule, FormsModule],
-  templateUrl: './percentage-calculator.component.html',
-  styleUrl: './percentage-calculator.component.scss'
+    selector: 'app-percentage-calculator',
+    imports: [CommonModule, FormsModule],
+    templateUrl: './percentage-calculator.component.html',
+    styleUrl: './percentage-calculator.component.scss'
 })
 export class PercentageCalculatorComponent implements OnDestroy {
   selectedUnit: string;

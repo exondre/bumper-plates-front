@@ -5,11 +5,10 @@ import { Subscription } from 'rxjs';
 import { SharedService } from '../service/shared.service';
 
 @Component({
-  selector: 'app-bumper-plates-calculator',
-  standalone: true,
-  imports: [CommonModule, FormsModule],
-  templateUrl: './bumper-plates-calculator.component.html',
-  styleUrls: ['./bumper-plates-calculator.component.scss'],
+    selector: 'app-bumper-plates-calculator',
+    imports: [CommonModule, FormsModule],
+    templateUrl: './bumper-plates-calculator.component.html',
+    styleUrls: ['./bumper-plates-calculator.component.scss']
 })
 export class BumperPlatesCalculatorComponent implements OnDestroy {
   initialWeight: number;

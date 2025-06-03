@@ -7,11 +7,10 @@ import { LSKeysEnum } from '../enums/LSKeysEnum';
 import { NewPrComponent } from './new-pr/new-pr.component';
 
 @Component({
-  selector: 'app-personal-records',
-  standalone: true,
-  imports: [CommonModule, NewPrComponent],
-  templateUrl: './personal-records.component.html',
-  styleUrl: './personal-records.component.scss'
+    selector: 'app-personal-records',
+    imports: [CommonModule, NewPrComponent],
+    templateUrl: './personal-records.component.html',
+    styleUrl: './personal-records.component.scss'
 })
 export class PersonalRecordsComponent implements OnDestroy, OnInit {
   personalRecords: any[] = [];

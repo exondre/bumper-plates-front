@@ -1,19 +1,18 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { ExerciseEnum } from '../../enums/ExerciseEnum';
 import { LSKeysEnum } from '../../enums/LSKeysEnum';
 import { LocalStorageService } from '../../service/local-storage.service';
 import { SharedService } from '../../service/shared.service';
 import { ExerciseLabelPipe } from '../../shared/pipes/exercise-label.pipe';
 import { PersonalRecord } from '../personal-record.interface';
+import { FormsModule } from '@angular/forms';
 
 @Component({
-  selector: 'app-new-pr',
-  standalone: true,
-  imports: [CommonModule, ExerciseLabelPipe, FormsModule],
-  templateUrl: './new-pr.component.html',
-  styleUrl: './new-pr.component.scss',
+    selector: 'app-new-pr',
+    imports: [CommonModule, ExerciseLabelPipe, FormsModule],
+    templateUrl: './new-pr.component.html',
+    styleUrl: './new-pr.component.scss'
 })
 export class NewPrComponent {
   weightRecord: number = 0;
