@@ -10,6 +10,8 @@ import { LSKeysEnum } from '../../../shared/enums/LSKeysEnum';
 import { ExerciseEnum } from '../../../shared/enums/ExerciseEnum';
 import { BumperPlatesCalculatorComponent } from '../../../bumper-plates-calculator/bumper-plates-calculator.component';
 import { TrainingCsvLoaderComponent } from '../training-csv-loader/training-csv-loader.component';
+import { TrainingService } from '../training.service';
+import { LocalStorageService } from '../../../service/local-storage.service';
 
 @Component({
   selector: 'app-training-week-selector',
@@ -31,22 +33,63 @@ export class TrainingWeekSelectorComponent {
     set: TrainingSet;
   } | null = null;
 
+  constructor(private localStorageService: LocalStorageService, private trainingService: TrainingService) {}
+
   ngOnInit() {
     // Ajusta LSKeysEnum.BP_TRAINING_WEEKS según tu código real
-    this.storedWeeks = JSON.parse(
-      localStorage.getItem(LSKeysEnum.BP_TRAINING_WEEKS) || '[]'
-    );
-    this.personalRecords = JSON.parse(
-      localStorage.getItem(LSKeysEnum.PERSONAL_RECORDS) || '[]'
-    );
+    const firstLoadAttempt = this.trainingService.getTrainingDataOnAppLoad();
+    if (firstLoadAttempt.error) {
+      const confirmMsg = `
+Detectamos un problema con tus datos de entrenamiento.
+Podemos intentar recuperar parte de la información, pero es posible que algunos datos se pierdan definitivamente.
+Si eliges no recuperar, podrás seguir usando la app, pero algunas funcionalidades estarán desactivadas hasta que resuelvas este problema.
+
+¿Deseas intentar recuperar tus datos?
+`;
+      if (confirm(confirmMsg)) {
+        this.trainingService.purgeCorruptedData();
+        this.storedWeeks = this.trainingService.getTrainingData();
+      }
+    } else {
+      this.storedWeeks = firstLoadAttempt.data;
+    }
+
+    this.personalRecords = JSON.parse(this.localStorageService.getItem(LSKeysEnum.PERSONAL_RECORDS)) || '[]';
   }
 
   selectWeek(week: TrainingWeek) {
+    if (this.selectedWeek === week) {
+      this.selectedWeek = undefined; // Deselect if already selected
+      return;
+    }
+
     this.selectedWeek = week;
     this.selectedSession = undefined;
   }
 
+  deleteWeek(week: TrainingWeek) {
+    if (!confirm('¿Seguro que deseas eliminar esta semana completa?')) return;
+
+    this.storedWeeks = this.storedWeeks.filter((w) => w !== week);
+
+    // Limpia selección si corresponde
+    if (this.selectedWeek === week) {
+      this.selectedWeek = undefined;
+      this.selectedSession = undefined;
+    }
+
+    // Persiste en localStorage
+    localStorage.setItem(
+      LSKeysEnum.BP_TRAINING_WEEKS,
+      JSON.stringify(this.storedWeeks)
+    );
+  }
+
   selectSession(session: TrainingSession) {
+    if (this.selectedSession === session) {
+      this.selectedSession = undefined; // Deselect if already selected
+      return;
+    }
     this.selectedSession = session;
   }
 

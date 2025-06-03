@@ -7,15 +7,28 @@
   <app-training-csv-loader></app-training-csv-loader>
   } @else {
   <h5>Semanas disponibles</h5>
-  <div class="btn-group mb-3" role="group" aria-label="Semanas">
-    @for (week of storedWeeks; track week.name) {
-    <button type="button" class="btn btn-outline-primary" [class.active]="selectedWeek === week"
-      (click)="selectWeek(week)">
-      {{ week.name }}
-    </button>
-    }
-  </div>
-
+ <ul class="list-group mb-3">
+  @for (week of storedWeeks; track week.name) {
+    <li
+      class="list-group-item d-flex align-items-center justify-content-between px-3 py-2"
+      [class.active]="selectedWeek === week"
+      [class.bg-primary]="selectedWeek === week"
+      [class.text-white]="selectedWeek === week"
+      (click)="selectWeek(week)"
+      style="cursor:pointer"
+    >
+      <span class="fw-bold">{{ week.name }}</span>
+      <button
+        title="Borrar semana"
+        type="button"
+        class="btn btn-danger btn-sm ms-3"
+        (click)="deleteWeek(week); $event.stopPropagation();"
+      >
+        <i class="bi bi-trash"></i>
+      </button>
+    </li>
+  }
+</ul>
   @if (selectedWeek) {
   <div>
     <h6>Sesiones de la semana {{ selectedWeek.name }}</h6>
@@ -41,9 +54,9 @@
         <ul class="list-inline mt-1">
           <div class="d-flex flex-wrap flex-sm-row gap-2">
             @for (set of ex.sets; track set.weightPercent) {
-              <button type="button" class="btn btn-outline-primary btn-sm" (click)="openCalculatorForSet(ex, set)">
-                {{ set.weightPercent ? set.weightPercent + '%' : '' }} {{ set.reps }}
-              </button>
+            <button type="button" class="btn btn-outline-primary btn-sm" (click)="openCalculatorForSet(ex, set)">
+              {{ set.weightPercent ? set.weightPercent + '%' : '' }} {{ set.reps }}
+            </button>
             }
           </div>
         </ul>
@@ -53,7 +66,8 @@
           {{ ex.repLibres }}
         </span>
         }
-        @if (selectedCalculator?.exercise?.exerciseType === ex?.exerciseType && selectedCalculator?.exercise?.name === ex?.name) {
+        @if (selectedCalculator?.exercise?.exerciseType === ex?.exerciseType && selectedCalculator?.exercise?.name ===
+        ex?.name) {
         <div class="mt-3">
           @let exCalc = selectedCalculator?.exercise!;
           @let setCalc = selectedCalculator?.set!;

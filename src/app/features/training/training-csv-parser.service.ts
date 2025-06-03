@@ -1,13 +1,12 @@
 // src/app/features/training/training-csv-parser.service.ts
 import { Injectable } from '@angular/core';
 import * as Papa from 'papaparse';
-import {
-  TrainingWeek,
-  TrainingSession,
-  TrainingExercise,
-  TrainingSet,
-} from './training.interface';
 import { ExerciseEnum } from '../../shared/enums/ExerciseEnum';
+import {
+  TrainingSession,
+  TrainingSet,
+  TrainingWeek,
+} from './training.interface';
 
 @Injectable({ providedIn: 'root' })
 export class TrainingCsvParserService {
@@ -49,11 +48,13 @@ export class TrainingCsvParserService {
       for (const sessionNum of sessionNumbers) {
         if (!sessionMap[sessionNum]) {
           sessionMap[sessionNum] = {
+            id: this.shortId(),
             sessionNumber: sessionNum,
             exercises: [],
           };
         }
         sessionMap[sessionNum].exercises.push({
+          id: this.shortId(),
           name,
           exerciseType: exerciseType || undefined,
           repLibres: repLibres || undefined,
@@ -63,6 +64,7 @@ export class TrainingCsvParserService {
     }
 
     return {
+      id: this.shortId(),
       name: weekName,
       sessions: Object.values(sessionMap),
     };
@@ -81,5 +83,9 @@ export class TrainingCsvParserService {
     const yyyy = target.getFullYear();
     const mm = String(target.getMonth() + 1).padStart(2, '0');
     return `${yyyy}-${mm}-#${weekNumber}`;
+  }
+
+  private shortId(length = 8): string {
+    return Math.random().toString(36).slice(2, 2 + length);
   }
 }

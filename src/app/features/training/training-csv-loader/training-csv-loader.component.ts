@@ -4,6 +4,7 @@ import { TrainingCsvParserService } from '../training-csv-parser.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LSKeysEnum } from '../../../shared/enums/LSKeysEnum';
+import { TrainingService } from '../training.service';
 
 @Component({
   selector: 'app-training-csv-loader',
@@ -13,18 +14,17 @@ import { LSKeysEnum } from '../../../shared/enums/LSKeysEnum';
 })
 export class TrainingCsvLoaderComponent {
   trainingWeeks = output<TrainingWeek[]>();
+  csvLoadingDone = output<void>();
 
   csvText = '';
   trainingWeek: TrainingWeek | null = null;
 
-  constructor(private csvParser: TrainingCsvParserService) {}
+  constructor(private trainingService: TrainingService) {}
 
   parse() {
-    this.trainingWeek = this.csvParser.parseCsv(this.csvText);
-    const storedTrainingWeeks = JSON.parse(localStorage.getItem(LSKeysEnum.BP_TRAINING_WEEKS) || '[]');
-    storedTrainingWeeks.push(this.trainingWeek);
-    localStorage.setItem(LSKeysEnum.BP_TRAINING_WEEKS, JSON.stringify(storedTrainingWeeks));
+    const storedTrainingWeeks = this.trainingService.loadDataFromCsv(this.csvText);
     this.trainingWeeks.emit(storedTrainingWeeks);
+    this.csvLoadingDone.emit();
   }
 
   onFileChange(event: any) {
