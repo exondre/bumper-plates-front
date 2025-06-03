@@ -1,6 +1,6 @@
 {
   "configVersion": 1,
-  "timestamp": 1741632479505,
+  "timestamp": 1748924836776,
   "index": "/index.html",
   "assetGroups": [
     {
@@ -13,10 +13,10 @@
       "urls": [
         "/favicon.ico",
         "/index.html",
-        "/main-BKI7ZGJK.js",
+        "/main-Z5WFIRAP.js",
         "/manifest.webmanifest",
-        "/polyfills-6EAL64PA.js",
-        "/styles-5INURTSO.css"
+        "/polyfills-B6TNHZQ6.js",
+        "/styles-BVJQD57C.css"
       ],
       "patterns": []
     },
@@ -59,11 +59,11 @@
     "/assets/icons/old_icon-512x512.png": "1de182f76f7329dfa8f9fcdd1fdcdd695bea6a99",
     "/assets/kandor.jpeg": "dbcd5f6905bb6ee2679babaf69afeb7214f9fffc",
     "/favicon.ico": "1e59eed9e96302b6e14803b88f2f650b0e6c1794",
-    "/index.html": "b52cf5acabf37631f5b45120036359d265d992f8",
-    "/main-BKI7ZGJK.js": "25d27c20eac1b4a45dec385f21e39ea41ce37ffa",
+    "/index.html": "7134d9df9813ccbf4c75001a9fee20d5b3f15881",
+    "/main-Z5WFIRAP.js": "0f58ff3e0cdc508b9bf024bf28ddf4e8803effb3",
     "/manifest.webmanifest": "75571fb7a057154726cde71a2141a66350cf77c0",
-    "/polyfills-6EAL64PA.js": "d874147a12a6570d9b44e99935e9de8b7f3cabbc",
-    "/styles-5INURTSO.css": "da39a3ee5e6b4b0d3255bfef95601890afd80709"
+    "/polyfills-B6TNHZQ6.js": "bf76ac291d7f51c1139b7edcf86b359a30c08c64",
+    "/styles-BVJQD57C.css": "386eac571570e25349aa8abed412809789ad1c9a"
   },
   "navigationUrls": [
     {
