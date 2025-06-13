@@ -1,34 +1,35 @@
 <div class="container mt-4">
   <h2>Entrenamientos</h2>
-  @if (storedWeeks.length === 0) {
+  @if (showWeekLoader) {
+  @if (!storedWeeks.length) {
   <div class="alert alert-warning" role="alert">
     No hay semanas de entrenamiento disponibles.
   </div>
-  <app-training-csv-loader></app-training-csv-loader>
+  }
+  <app-training-csv-loader (trainingWeeks)="listenToLoadingDone($event)"></app-training-csv-loader>
   } @else {
   <h5>Semanas disponibles</h5>
- <ul class="list-group mb-3">
-  @for (week of storedWeeks; track week.name) {
-    <li
-      class="list-group-item d-flex align-items-center justify-content-between px-3 py-2"
-      [class.active]="selectedWeek === week"
-      [class.bg-primary]="selectedWeek === week"
-      [class.text-white]="selectedWeek === week"
-      (click)="selectWeek(week)"
-      style="cursor:pointer"
-    >
+  <ul class="list-group mb-3">
+    @for (week of storedWeeks; track week.name) {
+    <li class="list-group-item d-flex align-items-center justify-content-between px-3 py-2"
+      [class.active]="selectedWeek === week" [class.bg-primary]="selectedWeek === week"
+      [class.text-white]="selectedWeek === week" (click)="selectWeek(week)" style="cursor:pointer">
       <span class="fw-bold">{{ week.name }}</span>
-      <button
-        title="Borrar semana"
-        type="button"
-        class="btn btn-danger btn-sm ms-3"
-        (click)="deleteWeek(week); $event.stopPropagation();"
-      >
+      <button title="Borrar semana" type="button" class="btn btn-danger btn-sm ms-3"
+        (click)="deleteWeek(week); $event.stopPropagation();">
         <i class="bi bi-trash"></i>
       </button>
     </li>
-  }
-</ul>
+    }
+    <li class="list-group-item d-flex align-items-center justify-content-between px-3 py-2" (click)="addWeek()"
+      style="cursor:pointer">
+      <span class="fw-bold"> Agregar semana </span>
+      <button title="Borrar semana" type="button" class="btn btn-outline-primary btn-sm ms-3"
+        (click)="addWeek(); $event.stopPropagation();">
+        <i class="bi bi-plus-lg"></i>
+      </button>
+    </li>
+  </ul>
   @if (selectedWeek) {
   <div>
     <h6>Sesiones de la semana {{ selectedWeek.name }}</h6>

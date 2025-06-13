@@ -36,6 +36,8 @@ export class TrainingWeekSelectorComponent {
   ];
   selectedBarbell: {value: number; unit: string} | null = null;
 
+  showWeekLoader: boolean = false;
+
   personalRecords: PersonalRecord[] = [];
   selectedCalculator: {
     exercise: TrainingExercise;
@@ -61,6 +63,10 @@ Si eliges no recuperar, podrás seguir usando la app, pero algunas funcionalidad
       }
     } else {
       this.storedWeeks = firstLoadAttempt.data;
+    }
+
+    if (!this.storedWeeks.length) {
+      this.showWeekLoader = true;
     }
 
     this.personalRecords = JSON.parse(this.localStorageService.getItem(LSKeysEnum.PERSONAL_RECORDS)) || '[]';
@@ -92,6 +98,15 @@ Si eliges no recuperar, podrás seguir usando la app, pero algunas funcionalidad
       LSKeysEnum.BP_TRAINING_WEEKS,
       JSON.stringify(this.storedWeeks)
     );
+  }
+
+  addWeek() {
+    this.showWeekLoader = true;
+  }
+
+  listenToLoadingDone(updatedWeeks: TrainingWeek[]) {
+    this.storedWeeks = updatedWeeks;
+    this.showWeekLoader = false;
   }
 
   selectSession(session: TrainingSession) {
