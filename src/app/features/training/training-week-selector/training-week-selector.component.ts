@@ -81,6 +81,7 @@ Si eliges no recuperar, podrás seguir usando la app, pero algunas funcionalidad
   selectWeek(week: TrainingWeek) {
     if (this.selectedWeek === week) {
       this.selectedWeek = undefined; // Deselect if already selected
+      this.selectedSession = undefined;
       return;
     }
 

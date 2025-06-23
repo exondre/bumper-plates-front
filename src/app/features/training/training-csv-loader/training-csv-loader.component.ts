@@ -1,16 +1,14 @@
-import { Component, output } from '@angular/core';
-import { TrainingWeek } from '../training.interface';
-import { TrainingCsvParserService } from '../training-csv-parser.service';
 import { CommonModule } from '@angular/common';
+import { Component, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { LSKeysEnum } from '../../../shared/enums/LSKeysEnum';
+import { TrainingWeek } from '../training.interface';
 import { TrainingService } from '../training.service';
 
 @Component({
   selector: 'app-training-csv-loader',
   imports: [CommonModule, FormsModule],
   templateUrl: './training-csv-loader.component.html',
-  styleUrl: './training-csv-loader.component.scss'
+  styleUrl: './training-csv-loader.component.scss',
 })
 export class TrainingCsvLoaderComponent {
   trainingWeeks = output<TrainingWeek[]>();
@@ -22,7 +20,26 @@ export class TrainingCsvLoaderComponent {
   constructor(private trainingService: TrainingService) {}
 
   parse() {
-    const storedTrainingWeeks = this.trainingService.loadDataFromCsv(this.csvText);
+    let csv = this.csvText.trim();
+
+    // Heuristic: Is it base64?
+    // - Only base64 characters: A-Za-z0-9+/=
+    // - Sufficiently long (avoids false positives with short strings)
+    // - Few or no line breaks
+    const isProbablyBase64 =
+      /^[A-Za-z0-9+/=\r\n]+$/.test(csv) &&
+      csv.length > 32 &&
+      (csv.match(/\n/g)?.length ?? 0) < 3;
+
+    if (isProbablyBase64) {
+      try {
+        // Try to decode. If it fails, continue as plain text.
+        csv = this.base64ToString(csv).trim();
+      } catch (e) {
+        // Not valid base64, continue as plain text
+      }
+    }
+    const storedTrainingWeeks = this.trainingService.loadDataFromCsv(csv);
     this.trainingWeeks.emit(storedTrainingWeeks);
     this.csvLoadingDone.emit();
   }
@@ -41,5 +58,12 @@ export class TrainingCsvLoaderComponent {
 
   cancel() {
     this.csvLoadingDone.emit();
+  }
+
+  private base64ToString(base64: string): string {
+    // Decodes a base64 string to UTF-8 (handles emojis and non-ASCII)
+    const binary = globalThis.atob(base64.replace(/\s/g, ''));
+    const bytes = Uint8Array.from(binary, (c) => c.charCodeAt(0));
+    return new TextDecoder().decode(bytes);
   }
 }
