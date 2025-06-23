@@ -1,18 +1,18 @@
 import { Component } from '@angular/core';
+import { LocalStorageService } from '../../../service/local-storage.service';
+import { ExerciseEnum } from '../../../shared/enums/ExerciseEnum';
+import { LSKeysEnum } from '../../../shared/enums/LSKeysEnum';
+import { WeightUnitEnum } from '../../../shared/enums/weight-unit.enum';
+import { BumperPlatesCalculatorComponent } from '../../bumper-plates-calculator/bumper-plates-calculator.component';
+import { PersonalRecord } from '../../personal-records/personal-record.interface';
+import { TrainingCsvLoaderComponent } from '../training-csv-loader/training-csv-loader.component';
 import {
   TrainingExercise,
   TrainingSession,
   TrainingSet,
   TrainingWeek,
 } from '../training.interface';
-import { PersonalRecord } from '../../../personal-records/personal-record.interface';
-import { LSKeysEnum } from '../../../shared/enums/LSKeysEnum';
-import { ExerciseEnum } from '../../../shared/enums/ExerciseEnum';
-import { BumperPlatesCalculatorComponent } from '../../../bumper-plates-calculator/bumper-plates-calculator.component';
-import { TrainingCsvLoaderComponent } from '../training-csv-loader/training-csv-loader.component';
 import { TrainingService } from '../training.service';
-import { LocalStorageService } from '../../../service/local-storage.service';
-import { WeightUnitEnum } from '../../../shared/enums/weight-unit.enum';
 
 @Component({
   selector: 'app-training-week-selector',
@@ -28,13 +28,13 @@ export class TrainingWeekSelectorComponent {
   initialWeight: number = 20; // Peso inicial por defecto
   initialWeightUnit: string = 'kg'; // Unidad de peso por defecto
 
-  barbellList: {value: number; unit: WeightUnitEnum }[] = [
+  barbellList: { value: number; unit: WeightUnitEnum }[] = [
     { value: 20, unit: WeightUnitEnum.KG },
     { value: 15, unit: WeightUnitEnum.KG },
     { value: 45, unit: WeightUnitEnum.LBS },
     { value: 35, unit: WeightUnitEnum.LBS },
   ];
-  selectedBarbell: {value: number; unit: string} | null = null;
+  selectedBarbell: { value: number; unit: string } | null = null;
 
   showWeekLoader: boolean = false;
 
@@ -44,7 +44,10 @@ export class TrainingWeekSelectorComponent {
     set: TrainingSet;
   } | null = null;
 
-  constructor(private localStorageService: LocalStorageService, private trainingService: TrainingService) {}
+  constructor(
+    private localStorageService: LocalStorageService,
+    private trainingService: TrainingService
+  ) {}
 
   ngOnInit() {
     // Ajusta LSKeysEnum.BP_TRAINING_WEEKS según tu código real
@@ -69,12 +72,16 @@ Si eliges no recuperar, podrás seguir usando la app, pero algunas funcionalidad
       this.showWeekLoader = true;
     }
 
-    this.personalRecords = JSON.parse(this.localStorageService.getItem(LSKeysEnum.PERSONAL_RECORDS)) || '[]';
+    this.personalRecords =
+      JSON.parse(
+        this.localStorageService.getItem(LSKeysEnum.PERSONAL_RECORDS)
+      ) || '[]';
   }
 
   selectWeek(week: TrainingWeek) {
     if (this.selectedWeek === week) {
       this.selectedWeek = undefined; // Deselect if already selected
+      this.selectedSession = undefined;
       return;
     }
 
@@ -104,8 +111,10 @@ Si eliges no recuperar, podrás seguir usando la app, pero algunas funcionalidad
     this.showWeekLoader = true;
   }
 
-  listenToLoadingDone(updatedWeeks: TrainingWeek[]) {
-    this.storedWeeks = updatedWeeks;
+  listenToLoadingDone(updatedWeeks?: TrainingWeek[]) {
+    if (updatedWeeks) {
+      this.storedWeeks = updatedWeeks;
+    }
     this.showWeekLoader = false;
   }
 
@@ -117,7 +126,7 @@ Si eliges no recuperar, podrás seguir usando la app, pero algunas funcionalidad
     this.selectedSession = session;
   }
 
-  selectBarbell(barbell: {value: number; unit: string}) {
+  selectBarbell(barbell: { value: number; unit: string }) {
     this.selectedBarbell = barbell;
     this.closeCalculator();
   }
