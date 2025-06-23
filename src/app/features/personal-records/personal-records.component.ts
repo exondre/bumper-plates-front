@@ -1,9 +1,9 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { SharedService } from '../service/shared.service';
+import { SharedService } from '../../service/shared.service';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
-import { LocalStorageService } from '../service/local-storage.service';
-import { LSKeysEnum } from '../shared/enums/LSKeysEnum';
+import { LocalStorageService } from '../../service/local-storage.service';
+import { LSKeysEnum } from '../../shared/enums/LSKeysEnum';
 import { NewPrComponent } from './new-pr/new-pr.component';
 import { PersonalRecord } from './personal-record.interface';
 

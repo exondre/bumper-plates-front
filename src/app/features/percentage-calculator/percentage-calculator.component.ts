@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { SharedService } from '../service/shared.service';
+import { SharedService } from '../../service/shared.service';
 import { Subscription } from 'rxjs';
 
 

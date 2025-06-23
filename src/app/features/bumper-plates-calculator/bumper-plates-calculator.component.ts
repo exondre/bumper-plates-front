@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, input, OnDestroy, OnInit, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import { SharedService } from '../service/shared.service';
+import { SharedService } from '../../service/shared.service';
 
 @Component({
   selector: 'app-bumper-plates-calculator',
