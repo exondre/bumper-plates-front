@@ -38,4 +38,8 @@ export class TrainingCsvLoaderComponent {
       reader.readAsText(file);
     }
   }
+
+  cancel() {
+    this.csvLoadingDone.emit();
+  }
 }

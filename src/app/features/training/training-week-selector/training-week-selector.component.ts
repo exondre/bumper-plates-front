@@ -110,8 +110,10 @@ Si eliges no recuperar, podrás seguir usando la app, pero algunas funcionalidad
     this.showWeekLoader = true;
   }
 
-  listenToLoadingDone(updatedWeeks: TrainingWeek[]) {
-    this.storedWeeks = updatedWeeks;
+  listenToLoadingDone(updatedWeeks?: TrainingWeek[]) {
+    if (updatedWeeks) {
+      this.storedWeeks = updatedWeeks;
+    }
     this.showWeekLoader = false;
   }
 

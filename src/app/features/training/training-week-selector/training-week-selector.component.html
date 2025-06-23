@@ -1,4 +1,4 @@
-<div class="container mt-4">
+<div class="container">
   <h2>Entrenamientos</h2>
   @if (showWeekLoader) {
   @if (!storedWeeks.length) {
@@ -6,7 +6,7 @@
     No hay semanas de entrenamiento disponibles.
   </div>
   }
-  <app-training-csv-loader (trainingWeeks)="listenToLoadingDone($event)"></app-training-csv-loader>
+  <app-training-csv-loader (trainingWeeks)="listenToLoadingDone($event)" (csvLoadingDone)="listenToLoadingDone()"></app-training-csv-loader>
   } @else {
   <h5>Semanas disponibles</h5>
   <ul class="list-group mb-3">

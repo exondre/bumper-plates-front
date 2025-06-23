@@ -1,7 +1,29 @@
-<h4>Cargar entrenamiento desde CSV</h4>
-<input type="file" (change)="onFileChange($event)" accept=".csv" />
-<br />
-<textarea [(ngModel)]="csvText" rows="10" placeholder="Pega aquí tu CSV"></textarea>
-<br />
-<button (click)="parse()">Parsear CSV</button>
-<pre *ngIf="trainingWeek">{{ trainingWeek | json }}</pre>
+<div class="card shadow mx-auto" style="max-width: 520px;">
+  <div class="card-header bg-primary text-white text-center">
+    <h4 class="mb-0">Cargar entrenamiento</h4>
+  </div>
+  <div class="card-body">
+    <div class="mb-1 text-center">
+      <label for="csvFileInput" class="form-label">Selecciona tu CSV</label>
+      <input type="file" id="csvFileInput" class="form-control" (change)="onFileChange($event)" accept=".csv" />
+    </div>
+
+    <div class="text-center mb-0 text-muted">
+      <span>o</span>
+    </div>
+
+    <div class="mb-3">
+      <label for="csvTextArea" class="form-label">Pega tu código aquí</label>
+      <textarea id="csvTextArea" class="form-control" [(ngModel)]="csvText" rows="7" placeholder="Pega tu código aquí"></textarea>
+    </div>
+
+    <div class="d-grid gap-2">
+      <button class="btn btn-success" (click)="parse()">
+        <i class="bi bi-arrow-right-circle me-2"></i> Cargar
+      </button>
+      <button class="btn btn-outline-secondary" (click)="cancel()">
+        Cancelar
+      </button>
+    </div>
+  </div>
+</div>
