@@ -1,6 +1,6 @@
 {
   "configVersion": 1,
-  "timestamp": 1750721276747,
+  "timestamp": 1753481743524,
   "index": "/index.html",
   "assetGroups": [
     {
@@ -13,7 +13,7 @@
       "urls": [
         "/favicon.ico",
         "/index.html",
-        "/main-OI3UJAGT.js",
+        "/main-VD3Q7G2K.js",
         "/manifest.webmanifest",
         "/polyfills-B6TNHZQ6.js",
         "/styles-EMBJAXFM.css"
@@ -61,8 +61,8 @@
     "/assets/icons/old_icon-512x512.png": "1de182f76f7329dfa8f9fcdd1fdcdd695bea6a99",
     "/assets/kandor.jpeg": "dbcd5f6905bb6ee2679babaf69afeb7214f9fffc",
     "/favicon.ico": "1e59eed9e96302b6e14803b88f2f650b0e6c1794",
-    "/index.html": "7734f768e8e8a90c48392c9781e1dcc11ed30940",
-    "/main-OI3UJAGT.js": "d78034d5d62fbc343c92356743219459d578b072",
+    "/index.html": "d34c209c22e0a9709971dd2890f8a692463d6415",
+    "/main-VD3Q7G2K.js": "ef0772e5255a33122d5aef321c8c76565a289d3a",
     "/manifest.webmanifest": "6cd0383dbd3f7211033d90e3d1ca0ed5673b1a70",
     "/media/bootstrap-icons-CVBWLLHT.woff2": "b441fcff939e24fa0906a37b7788788b9fddbb68",
     "/media/bootstrap-icons-VQNJTM6Q.woff": "762010c79b4a05e1131fc8fb3b1aeff324d8033f",
