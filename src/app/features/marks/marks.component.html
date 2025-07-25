@@ -1,7 +1,11 @@
 <div class="container py-3">
   <app-personal-records></app-personal-records>
-  <hr *ngIf="showPercentageCalc">
-  <app-percentage-calculator *ngIf="showPercentageCalc"></app-percentage-calculator>
-  <hr *ngIf="showPlatesCalc">
-  <app-bumper-plates-calculator *ngIf="showPlatesCalc"></app-bumper-plates-calculator>
+  @if (showPercentageCalc) {
+    <hr />
+    <app-percentage-calculator></app-percentage-calculator>
+  }
+  @if (showPlatesCalc) {
+    <hr />
+    <app-bumper-plates-calculator></app-bumper-plates-calculator>
+  }
 </div>
