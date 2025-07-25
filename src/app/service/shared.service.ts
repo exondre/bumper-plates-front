@@ -1,6 +1,7 @@
 // shared.service.ts
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Subject } from 'rxjs';
+import { TrainingSession, TrainingWeek } from '../features/training/training.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -10,6 +11,8 @@ export class SharedService {
   private showNewPR = new Subject<any>();
   private reloadPR = new Subject<boolean>();
   private selectedPR = new BehaviorSubject<any>(null);
+  private selectedWeek = new BehaviorSubject<TrainingWeek | null>(null);
+  private selectedSession = new BehaviorSubject<TrainingSession | null>(null);
 
   readonly poundToKiloFactor = 0.453592;
   readonly kiloToPoundFactor = 2.20462;
@@ -44,5 +47,21 @@ export class SharedService {
 
   getSelectedPREvent() {
     return this.selectedPR.asObservable();
+  }
+
+  setSelectedWeek(week: TrainingWeek | null) {
+    this.selectedWeek.next(week);
+  }
+
+  getSelectedWeek() {
+    return this.selectedWeek.asObservable();
+  }
+
+  setSelectedSession(session: TrainingSession | null) {
+    this.selectedSession.next(session);
+  }
+
+  getSelectedSession() {
+    return this.selectedSession.asObservable();
   }
 }

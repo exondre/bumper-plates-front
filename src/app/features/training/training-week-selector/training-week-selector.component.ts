@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { LocalStorageService } from '../../../service/local-storage.service';
 import { ExerciseEnum } from '../../../shared/enums/ExerciseEnum';
 import { LSKeysEnum } from '../../../shared/enums/LSKeysEnum';
@@ -13,6 +13,8 @@ import {
   TrainingWeek,
 } from '../training.interface';
 import { TrainingService } from '../training.service';
+import { SharedService } from '../../../service/shared.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-training-week-selector',
@@ -20,7 +22,7 @@ import { TrainingService } from '../training.service';
   templateUrl: './training-week-selector.component.html',
   styleUrl: './training-week-selector.component.scss',
 })
-export class TrainingWeekSelectorComponent {
+export class TrainingWeekSelectorComponent implements OnDestroy {
   storedWeeks: TrainingWeek[] = [];
   selectedWeek?: TrainingWeek;
   selectedSession?: TrainingSession;
@@ -44,10 +46,21 @@ export class TrainingWeekSelectorComponent {
     set: TrainingSet;
   } | null = null;
 
+  private weekSub: Subscription;
+  private sessionSub: Subscription;
+
   constructor(
     private localStorageService: LocalStorageService,
-    private trainingService: TrainingService
-  ) {}
+    private trainingService: TrainingService,
+    private sharedService: SharedService
+  ) {
+    this.weekSub = this.sharedService
+      .getSelectedWeek()
+      .subscribe((w) => (this.selectedWeek = w || undefined));
+    this.sessionSub = this.sharedService
+      .getSelectedSession()
+      .subscribe((s) => (this.selectedSession = s || undefined));
+  }
 
   ngOnInit() {
     // Ajusta LSKeysEnum.BP_TRAINING_WEEKS según tu código real
@@ -82,11 +95,15 @@ Si eliges no recuperar, podrás seguir usando la app, pero algunas funcionalidad
     if (this.selectedWeek === week) {
       this.selectedWeek = undefined; // Deselect if already selected
       this.selectedSession = undefined;
+      this.sharedService.setSelectedWeek(null);
+      this.sharedService.setSelectedSession(null);
       return;
     }
 
     this.selectedWeek = week;
     this.selectedSession = undefined;
+    this.sharedService.setSelectedWeek(week);
+    this.sharedService.setSelectedSession(null);
   }
 
   deleteWeek(week: TrainingWeek) {
@@ -121,9 +138,11 @@ Si eliges no recuperar, podrás seguir usando la app, pero algunas funcionalidad
   selectSession(session: TrainingSession) {
     if (this.selectedSession === session) {
       this.selectedSession = undefined; // Deselect if already selected
+      this.sharedService.setSelectedSession(null);
       return;
     }
     this.selectedSession = session;
+    this.sharedService.setSelectedSession(session);
   }
 
   selectBarbell(barbell: { value: number; unit: string }) {
@@ -150,5 +169,12 @@ Si eliges no recuperar, podrás seguir usando la app, pero algunas funcionalidad
 
   closeCalculator() {
     this.selectedCalculator = null;
+  }
+
+  ngOnDestroy(): void {
+    this.sharedService.setSelectedWeek(this.selectedWeek ?? null);
+    this.sharedService.setSelectedSession(this.selectedSession ?? null);
+    this.weekSub.unsubscribe();
+    this.sessionSub.unsubscribe();
   }
 }
