@@ -16,6 +16,7 @@ export class BumperPlatesCalculatorComponent implements OnInit, OnDestroy {
   desiredWeightInput = input<number>();
   desiredWeightUnitInput = input<string>();
   externalInputModeInput = input<boolean>(false);
+  listenPercentageEventsInput = input<boolean>(true);
   closedSignal = output<void>();
 
   externalInputMode: boolean = false;
@@ -26,7 +27,7 @@ export class BumperPlatesCalculatorComponent implements OnInit, OnDestroy {
   extraWeight: number;
   initialWeightUnit: string;
   desiredWeightUnit: string;
-  selectedPercentageSuscription: Subscription;
+  selectedPercentageSuscription?: Subscription;
 
   constructor(private sharedService: SharedService) {
     this.initialWeight = 20; // Default bar weight
@@ -36,33 +37,34 @@ export class BumperPlatesCalculatorComponent implements OnInit, OnDestroy {
     this.extraWeight = 0;
     this.initialWeightUnit = 'kg';
     this.desiredWeightUnit = 'lbs';
-
-    this.selectedPercentageSuscription = this.sharedService
-      .getSelectedPercentageEvent()
-      .subscribe((p) => {
-        // Perform actions based on the received data
-        // console.log(p);
-        this.desiredWeight = p.percentageWeight;
-        this.desiredWeightUnit = p.unit;
-        this.calculate();
-      });
   }
 
   ngOnInit(): void {
-    // If external input mode is enabled, calculate the initial values
     this.externalInputMode = this.externalInputModeInput();
+    const listenEvents = this.listenPercentageEventsInput();
+    if (listenEvents && !this.externalInputMode) {
+      this.selectedPercentageSuscription = this.sharedService
+        .getSelectedPercentageEvent()
+        .subscribe((p) => {
+          if (p) {
+            this.desiredWeight = p.percentageWeight;
+            this.desiredWeightUnit = p.unit;
+            this.calculate();
+          }
+        });
+    }
+
     if (this.externalInputMode) {
-      this.initialWeight = this.initialWeightInput()!; // Default bar weight
+      this.initialWeight = this.initialWeightInput()!;
       this.initialWeightUnit = this.initialWeightUnitInput()!;
       this.desiredWeight = this.desiredWeightInput()!;
       this.desiredWeightUnit = this.desiredWeightUnitInput()!;
       this.calculate();
-      this.selectedPercentageSuscription.unsubscribe();
     }
   }
 
   ngOnDestroy(): void {
-    this.selectedPercentageSuscription.unsubscribe();
+    this.selectedPercentageSuscription?.unsubscribe();
   }
 
   close() {

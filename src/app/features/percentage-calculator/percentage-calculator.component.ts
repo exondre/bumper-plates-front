@@ -39,7 +39,13 @@ export class PercentageCalculatorComponent implements OnDestroy {
 
     this.percentages.sort((a, b) => a.percentageValue - b.percentageValue);
 
-    this.selectedPRSubscription = this.sharedService.getSelectedPREvent().subscribe( pr => this.setSelectedPR(pr) );
+    this.selectedPRSubscription = this.sharedService
+      .getSelectedPREvent()
+      .subscribe((pr) => {
+        if (pr) {
+          this.setSelectedPR(pr);
+        }
+      });
   }
 
   ngOnDestroy(): void {
