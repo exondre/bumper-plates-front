@@ -2,7 +2,16 @@ nav {
   font-size: 0.8rem;
   height: 4rem;
   .nav-link {
-    padding: 0.25rem 0;
+    padding: 0.25rem 0.25rem;
+    min-width: 0;
+
+    span {
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      width: 100%;
+    }
   }
 }
 
