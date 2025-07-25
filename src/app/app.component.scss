@@ -3,6 +3,13 @@ nav {
 }
 
 .app-content {
-  padding-top: 4rem; // space for fixed header
   padding-bottom: 4rem; // space for bottom nav
+}
+
+.has-header {
+  padding-top: 4rem; // space for fixed header
+}
+
+.no-header {
+  padding-top: 0;
 }

@@ -1,10 +1,10 @@
-<header class="navbar navbar-light bg-light fixed-top border-bottom">
+<header *ngIf="!hideHeader" class="navbar navbar-light bg-light fixed-top border-bottom justify-content-center">
   <a class="navbar-brand d-flex align-items-center" routerLink="/home">
     <img src="assets/icons/icon.svg" width="30" height="30" class="me-2" alt="logo">
     <span>Bumper Plates</span>
   </a>
 </header>
-<main class="app-content">
+<main class="app-content" [ngClass]="{ 'has-header': !hideHeader, 'no-header': hideHeader }">
   <router-outlet></router-outlet>
 </main>
 <nav class="nav nav-pills nav-fill fixed-bottom bg-light border-top">
