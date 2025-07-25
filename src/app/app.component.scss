@@ -1,5 +1,9 @@
 nav {
   font-size: 0.8rem;
+  height: 4rem;
+  .nav-link {
+    padding: 0.25rem 0;
+  }
 }
 
 .app-content {

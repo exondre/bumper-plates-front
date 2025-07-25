@@ -7,25 +7,25 @@
 <main class="app-content" [ngClass]="{ 'has-header': !hideHeader, 'no-header': hideHeader }">
   <router-outlet></router-outlet>
 </main>
-<nav class="nav nav-pills nav-fill fixed-bottom bg-light border-top">
-  <a class="nav-link" routerLink="/home" routerLinkActive="active" aria-label="Inicio">
+<nav class="nav nav-pills nav-fill flex-nowrap fixed-bottom bg-light border-top">
+  <a class="nav-link d-flex flex-column align-items-center justify-content-center" routerLink="/home" routerLinkActive="active" aria-label="Inicio">
     <i class="bi bi-house"></i>
-    <span class="d-block">Home</span>
+    <span class="d-none d-sm-block">Home</span>
   </a>
-  <a class="nav-link" routerLink="/entrenamientos" routerLinkActive="active" aria-label="Entrenamientos">
+  <a class="nav-link d-flex flex-column align-items-center justify-content-center" routerLink="/entrenamientos" routerLinkActive="active" aria-label="Entrenamientos">
     <i class="bi bi-calendar-check"></i>
-    <span class="d-block">Entrenamientos</span>
+    <span class="d-none d-sm-block">Entrenamientos</span>
   </a>
-  <a class="nav-link" routerLink="/marcas" routerLinkActive="active" aria-label="Marcas">
+  <a class="nav-link d-flex flex-column align-items-center justify-content-center" routerLink="/marcas" routerLinkActive="active" aria-label="Marcas">
     <i class="bi bi-trophy"></i>
-    <span class="d-block">Marcas</span>
+    <span class="d-none d-sm-block">Marcas</span>
   </a>
-  <a class="nav-link" routerLink="/calculadora" routerLinkActive="active" aria-label="Calculadora">
+  <a class="nav-link d-flex flex-column align-items-center justify-content-center" routerLink="/calculadora" routerLinkActive="active" aria-label="Calculadora">
     <i class="bi bi-calculator"></i>
-    <span class="d-block">Calculadora</span>
+    <span class="d-none d-sm-block">Calculadora</span>
   </a>
-  <a class="nav-link d-none" routerLink="/configuraciones" routerLinkActive="active" aria-label="Configuraciones">
+  <a class="nav-link d-none d-flex flex-column align-items-center justify-content-center" routerLink="/configuraciones" routerLinkActive="active" aria-label="Configuraciones">
     <i class="bi bi-gear"></i>
-    <span class="d-block">Config</span>
+    <span class="d-none d-sm-block">Config</span>
   </a>
 </nav>
