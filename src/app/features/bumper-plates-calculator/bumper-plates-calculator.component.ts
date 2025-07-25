@@ -40,11 +40,11 @@ export class BumperPlatesCalculatorComponent implements OnInit, OnDestroy {
     this.selectedPercentageSuscription = this.sharedService
       .getSelectedPercentageEvent()
       .subscribe((p) => {
-        // Perform actions based on the received data
-        // console.log(p);
-        this.desiredWeight = p.percentageWeight;
-        this.desiredWeightUnit = p.unit;
-        this.calculate();
+        if (p) {
+          this.desiredWeight = p.percentageWeight;
+          this.desiredWeightUnit = p.unit;
+          this.calculate();
+        }
       });
   }
 

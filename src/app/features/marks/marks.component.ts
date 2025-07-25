@@ -27,14 +27,18 @@ export class MarksComponent implements OnDestroy {
   constructor(private sharedService: SharedService) {
     this.prSub = this.sharedService
       .getSelectedPREvent()
-      .subscribe(() => {
-        this.showPercentageCalc = true;
-        this.showPlatesCalc = false;
+      .subscribe((pr) => {
+        if (pr) {
+          this.showPercentageCalc = true;
+          this.showPlatesCalc = false;
+        }
       });
     this.percSub = this.sharedService
       .getSelectedPercentageEvent()
-      .subscribe(() => {
-        this.showPlatesCalc = true;
+      .subscribe((p) => {
+        if (p) {
+          this.showPlatesCalc = true;
+        }
       });
   }
 

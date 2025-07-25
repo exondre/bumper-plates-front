@@ -1,15 +1,15 @@
 // shared.service.ts
 import { Injectable } from '@angular/core';
-import { Subject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SharedService {
-  private selectedPercentage = new Subject<any>();
+  private selectedPercentage = new BehaviorSubject<any>(null);
   private showNewPR = new Subject<any>();
   private reloadPR = new Subject<boolean>();
-  private selectedPR = new Subject<any>();
+  private selectedPR = new BehaviorSubject<any>(null);
 
   readonly poundToKiloFactor = 0.453592;
   readonly kiloToPoundFactor = 2.20462;
