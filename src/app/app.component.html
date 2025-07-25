@@ -1,4 +1,12 @@
-<router-outlet></router-outlet>
+<header class="navbar navbar-light bg-light fixed-top border-bottom">
+  <a class="navbar-brand d-flex align-items-center" routerLink="/home">
+    <img src="assets/icons/icon.svg" width="30" height="30" class="me-2" alt="logo">
+    <span>Bumper Plates</span>
+  </a>
+</header>
+<main class="app-content">
+  <router-outlet></router-outlet>
+</main>
 <nav class="nav nav-pills nav-fill fixed-bottom bg-light border-top">
   <a class="nav-link" routerLink="/home" routerLinkActive="active" aria-label="Inicio">
     <i class="bi bi-house"></i>
