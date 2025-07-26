@@ -19,3 +19,4 @@ See README.md
 - After modifying or adding code, run `npm run build`. For now, avoid running commands like `npm test -- --watch=false` because tests will fail
 - Project uses semantic versioning, e.g. MAJOR.MINOR.PATCH. Always upgrade project version number in `package.json`, but only MINOR version number and only ONCE per PR. If PATCH version number is greater than 0, you are allowed and you must reset to 0.
 - Use descriptive commit messages and include gitmojis accordingly
+- Commit messages must be written exclusively in english
