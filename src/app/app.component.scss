@@ -1,6 +1,9 @@
 nav {
   font-size: 0.8rem;
-  height: 4rem;
+  height: calc(4rem + constant(safe-area-inset-bottom));
+  height: calc(4rem + env(safe-area-inset-bottom));
+  padding-bottom: constant(safe-area-inset-bottom);
+  padding-bottom: env(safe-area-inset-bottom);
   .nav-link {
     padding: 0.25rem 0.25rem;
     min-width: 0;
@@ -16,7 +19,8 @@ nav {
 }
 
 .app-content {
-  padding-bottom: 4rem; // space for bottom nav
+  padding-bottom: calc(4rem + constant(safe-area-inset-bottom)); // space for bottom nav
+  padding-bottom: calc(4rem + env(safe-area-inset-bottom));
 }
 
 .has-header {
