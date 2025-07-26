@@ -10,7 +10,8 @@ See README.md
 
 ## Guidelines
 
-- Use single quotes, no semicolons, trailing commas
+- Prefer single quotes
+- Use trailing commas
 - Don't forget to add documentation for all new functions in components and use JSDoc docstrings for documenting TypeScript definitions, not `//` comments
 - Use descriptive variable/function names
 - Prefer functional programming patterns
