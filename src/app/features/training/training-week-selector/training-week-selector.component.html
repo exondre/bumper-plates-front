@@ -1,14 +1,16 @@
-<div class="container">
+<div class="container mb-3">
   <h2>Entrenamientos</h2>
   @if (showWeekLoader) {
-  @if (!storedWeeks.length) {
-  <div class="alert alert-warning" role="alert">
-    No hay semanas de entrenamiento disponibles.
-  </div>
-  }
+
   <app-training-csv-loader (trainingWeeks)="listenToLoadingDone($event)" (csvLoadingDone)="listenToLoadingDone()"></app-training-csv-loader>
   } @else {
+  @if (!storedWeeks.length) {
+    <div class="alert alert-warning" role="alert">
+      Aún no tienes entrenamientos disponibles. ¡Prueba cargando uno! 🏋️
+    </div>
+  } @else {
   <h5>Semanas disponibles</h5>
+  }
   <ul class="list-group mb-3">
     @for (week of storedWeeks; track week.name) {
     <li class="list-group-item d-flex align-items-center justify-content-between px-3 py-2"

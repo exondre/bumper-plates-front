@@ -32,7 +32,7 @@ export class TrainingService {
 
   getTrainingDataOnAppLoad(): { data: TrainingWeek[], error: boolean } {
     const rawDataFromLocalStorage = this.localStorageService.getItem(LSKeysEnum.BP_TRAINING_WEEKS);
-    const dataFromLocalStorage = JSON.parse(rawDataFromLocalStorage);
+    const dataFromLocalStorage = JSON.parse(rawDataFromLocalStorage) ?? [];
     const dataMissingId = dataFromLocalStorage.some((d: { id: any; }) => !d.id);
     if (dataFromLocalStorage && !dataMissingId) {
       return { data: dataFromLocalStorage, error: false };
