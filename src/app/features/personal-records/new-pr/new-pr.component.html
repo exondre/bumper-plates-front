@@ -1,17 +1,17 @@
 <div class="container">
   <div class="card mx-auto shadow">
     <div class="card-header bg-primary text-white text-center">
-      <h4 class="mb-0">Registrando nuevo PR...</h4>
+      <h4 class="mb-0">Registrando nueva marca...</h4>
     </div>
     <div class="card-body">
       <form (ngSubmit)="saveNewRecord()" autocomplete="off">
         <div class="mb-3">
-          <label for="weightRecordName" class="form-label">Nombre del PR</label>
+          <label for="weightRecordName" class="form-label">Nombre</label>
           <input type="text" class="form-control" id="weightRecordName" [(ngModel)]="weightRecordName"
             name="weightRecordName" required>
         </div>
         <div class="mb-3">
-          <label for="weightRecord" class="form-label">Peso del PR</label>
+          <label for="weightRecord" class="form-label">Peso</label>
           <div class="input-group">
             <input type="number" class="form-control w-75" id="weightRecord" [(ngModel)]="weightRecord"
               name="weightRecord" required>
@@ -23,7 +23,7 @@
           </div>
         </div>
         <div class="mb-3">
-          <label for="recordExcerciseType" class="form-label">Tipo del PR</label>
+          <label for="recordExcerciseType" class="form-label">Tipo de ejercicio</label>
           <select id="recordExcerciseType" class="form-select" [(ngModel)]="recordExcerciseType"
             name="recordExcerciseType" required>
             @for (type of exerciseTypes; track type) {
