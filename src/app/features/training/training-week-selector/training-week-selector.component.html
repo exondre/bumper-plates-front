@@ -1,13 +1,13 @@
 <div class="container mb-3">
   <h2>Entrenamientos</h2>
   @if (showWeekLoader) {
-
-  <app-training-csv-loader (trainingWeeks)="listenToLoadingDone($event)" (csvLoadingDone)="listenToLoadingDone()"></app-training-csv-loader>
+  <app-training-csv-loader (trainingWeeks)="listenToLoadingDone($event)"
+    (csvLoadingDone)="listenToLoadingDone()"></app-training-csv-loader>
   } @else {
   @if (!storedWeeks.length) {
-    <div class="alert alert-warning" role="alert">
-      Aún no tienes entrenamientos disponibles. ¡Prueba cargando uno! 🏋️
-    </div>
+  <div class="alert alert-warning" role="alert">
+    Aún no tienes entrenamientos disponibles. ¡Prueba cargando uno! 🏋️
+  </div>
   } @else {
   <h5>Semanas disponibles</h5>
   }

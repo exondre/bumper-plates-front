@@ -81,10 +81,6 @@ Si eliges no recuperar, podrás seguir usando la app, pero algunas funcionalidad
       this.storedWeeks = firstLoadAttempt.data;
     }
 
-    if (!this.storedWeeks.length) {
-      this.showWeekLoader = true;
-    }
-
     this.personalRecords =
       JSON.parse(
         this.localStorageService.getItem(LSKeysEnum.PERSONAL_RECORDS)
