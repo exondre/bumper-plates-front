@@ -18,13 +18,21 @@ nav {
   }
 }
 
+header.navbar {
+  background: var(--bs-body-bg);
+  padding-top: constant(safe-area-inset-top);
+  padding-top: env(safe-area-inset-top);
+}
+
 .app-content {
   padding-bottom: calc(4rem + constant(safe-area-inset-bottom)); // space for bottom nav
   padding-bottom: calc(4rem + env(safe-area-inset-bottom));
 }
 
 .has-header {
-  padding-top: 4rem; // space for fixed header
+  // space for fixed header including safe area on notched devices
+  padding-top: calc(4rem + constant(safe-area-inset-top));
+  padding-top: calc(4rem + env(safe-area-inset-top));
 }
 
 .no-header {
