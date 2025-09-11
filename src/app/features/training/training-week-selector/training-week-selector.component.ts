@@ -167,6 +167,22 @@ Si eliges no recuperar, podrás seguir usando la app, pero algunas funcionalidad
     this.selectedCalculator = null;
   }
 
+  getDesiredWeightForSet(pr: PersonalRecord, set: TrainingSet, barbellWeightUnit: WeightUnitEnum | string): number {
+    const desiredWeight = pr && set?.weightPercent ? (pr?.record! * set?.weightPercent! / 100) : pr?.record ?? 20;
+
+    if (barbellWeightUnit === WeightUnitEnum.KG.toString() && pr.recordUnit === WeightUnitEnum.LBS) {
+      // Convertir de lbs a kg
+      return +(desiredWeight * this.sharedService.poundToKiloFactor).toFixed(2);
+    }
+
+    if (barbellWeightUnit === WeightUnitEnum.LBS.toString() && pr.recordUnit === WeightUnitEnum.KG) {
+      // Convertir de kg a lbs
+      return +(desiredWeight * this.sharedService.kiloToPoundFactor).toFixed(2);
+    }
+
+    return desiredWeight;
+  }
+
   ngOnDestroy(): void {
     this.sharedService.setSelectedWeek(this.selectedWeek ?? null);
     this.sharedService.setSelectedSession(this.selectedSession ?? null);

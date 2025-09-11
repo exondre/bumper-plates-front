@@ -89,7 +89,7 @@
           @let pr = getPersonalRecordForType(exCalc.exerciseType!);
           <app-bumper-plates-calculator (closedSignal)="closeCalculator()" [externalInputModeInput]="true"
             [initialWeightInput]="selectedBarbell?.value" [initialWeightUnitInput]="selectedBarbell?.unit"
-            [desiredWeightInput]="pr && setCalc?.weightPercent ? (pr?.record! * setCalc?.weightPercent! / 100) : pr?.record ?? 20"
+            [desiredWeightInput]="getDesiredWeightForSet(pr!, setCalc, selectedBarbell!.unit)"
             [desiredWeightUnitInput]="selectedBarbell?.unit ?? 'kg'">
           </app-bumper-plates-calculator>
         </div>
