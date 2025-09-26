@@ -1,11 +1,9 @@
-<div class="container py-3">
-  <app-personal-records></app-personal-records>
-  @if (showPercentageCalc) {
-    <hr />
-    <app-percentage-calculator></app-percentage-calculator>
-  }
-  @if (showPlatesCalc) {
-    <hr />
-    <app-bumper-plates-calculator></app-bumper-plates-calculator>
-  }
-</div>
+<app-personal-records></app-personal-records>
+@if (showPercentageCalc) {
+<hr />
+<app-percentage-calculator></app-percentage-calculator>
+}
+@if (showPlatesCalc) {
+<hr />
+<app-bumper-plates-calculator></app-bumper-plates-calculator>
+}
