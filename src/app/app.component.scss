@@ -20,8 +20,9 @@ nav {
 
   &.custom-nav {
     border-radius: 50px;
-    margin-left: 1rem;
-    margin-right: 1rem;
+    padding: .15rem;
+    margin-left: .85rem;
+    margin-right: .85rem;
     background-color: rgba(var(--bs-light-rgb), 0.5) !important;
     -webkit-backdrop-filter: blur(1.5px);
     backdrop-filter: blur(1.5px);
@@ -29,6 +30,7 @@ nav {
 
     .nav-link {
       border-radius: 50px !important;
+
       &.active {
         background-color: rgba(13, 110, 253, 0.8);
       }
@@ -37,10 +39,19 @@ nav {
   }
 }
 
-header.navbar {
-  background: var(--bs-body-bg);
-  padding-top: constant(safe-area-inset-top);
-  padding-top: env(safe-area-inset-top);
+header {
+  &.navbar {
+    background: var(--bs-body-bg);
+    padding-top: calc(.5rem + constant(safe-area-inset-top));
+    padding-top: calc(.5rem + env(safe-area-inset-top));
+  }
+
+  &.custom-header {
+    background-color: rgba(var(--bs-body-bg-rgb),0.5)!important;
+    -webkit-backdrop-filter: blur(1.5px);
+    backdrop-filter: blur(1.5px);
+    font-weight: 500;
+  }
 }
 
 .app-content {
