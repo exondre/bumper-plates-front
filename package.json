@@ -1,6 +1,6 @@
 {
   "name": "bumper-plates-front",
-  "version": "0.9.1a",
+  "version": "0.9.1b",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
