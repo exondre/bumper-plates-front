@@ -1,9 +1,12 @@
 import { ExerciseEnum } from '../../shared/enums/ExerciseEnum';
 
+/** Represents a user-defined record for a specific exercise or lift. */
 export interface PersonalRecord {
   recordName: string;
   record: number;
   recordUnit: string;
-  exerciseType?: ExerciseEnum; // Optional field for exercise type
-  date?: Date; // Optional field for the date of the record
+  /** Exercise type associated with the record when available. */
+  exerciseType?: ExerciseEnum;
+  /** ISO timestamp string or Date instance indicating when the record was logged. */
+  date?: Date | string;
 }

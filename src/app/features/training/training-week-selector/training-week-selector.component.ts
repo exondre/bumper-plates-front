@@ -147,12 +147,50 @@ Si eliges no recuperar, podrás seguir usando la app, pero algunas funcionalidad
   }
 
   getPersonalRecordForType(
-    exerciseType: ExerciseEnum
+    exerciseType: ExerciseEnum,
   ): PersonalRecord | undefined {
-    const pr = this.personalRecords.find(
-      (record) => record.exerciseType === exerciseType
+    const matchingRecords = this.personalRecords.filter(
+      (record) => record.exerciseType === exerciseType,
     );
-    return pr;
+
+    if (matchingRecords.length === 0) {
+      return undefined;
+    }
+
+    const toTimestamp = (record: PersonalRecord): number => {
+      const rawDate = record.date;
+      if (!rawDate) {
+        return Number.NEGATIVE_INFINITY;
+      }
+
+      const parsedDate =
+        rawDate instanceof Date ? rawDate : new Date(rawDate);
+      const timestamp = parsedDate.getTime();
+
+      return Number.isNaN(timestamp) ? Number.NEGATIVE_INFINITY : timestamp;
+    };
+
+    return matchingRecords.reduce<PersonalRecord | undefined>(
+      (latest, current) => {
+        if (!latest) {
+          return current;
+        }
+
+        const latestTimestamp = toTimestamp(latest);
+        const currentTimestamp = toTimestamp(current);
+
+        if (currentTimestamp > latestTimestamp) {
+          return current;
+        }
+
+        if (currentTimestamp === latestTimestamp) {
+          return current;
+        }
+
+        return latest;
+      },
+      undefined,
+    );
   }
 
   openCalculatorForSet(exercise: TrainingExercise, set: TrainingSet) {
