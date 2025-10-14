@@ -7,6 +7,7 @@ import { LSKeysEnum } from '../../shared/enums/LSKeysEnum';
 import { NewPrComponent } from './new-pr/new-pr.component';
 import { PersonalRecord } from './personal-record.interface';
 import { DataSyncResource, DataSyncService } from '../../service/data-sync.service';
+import { ExerciseEnum } from '../../shared/enums/ExerciseEnum';
 
 @Component({
     selector: 'app-personal-records',
@@ -62,7 +63,10 @@ export class PersonalRecordsComponent implements OnDestroy, OnInit {
   }
 
   loadPersonalRecords() {
-    this.personalRecords = JSON.parse(this.lsService.getItem(LSKeysEnum.PERSONAL_RECORDS)) ?? [];
+    const storedValue = this.lsService.getItem(LSKeysEnum.PERSONAL_RECORDS);
+    const parsedRecords: PersonalRecord[] = storedValue ? JSON.parse(storedValue) : [];
+
+    this.personalRecords = this.sortPersonalRecords(parsedRecords);
   }
 
   sendToPercentageCalculator(ev: MouseEvent, p: any) {
@@ -198,5 +202,63 @@ export class PersonalRecordsComponent implements OnDestroy, OnInit {
       window.clearTimeout(this.feedbackResetTimeoutId);
       this.feedbackResetTimeoutId = null;
     }
+  }
+
+  /**
+   * Sorts personal records prioritizing snatch, clean & jerk, and then remaining entries alphabetically.
+   * Records within the same exercise type are ordered by recency.
+   */
+  private sortPersonalRecords(records: PersonalRecord[]): PersonalRecord[] {
+    const toTimestamp = (record: PersonalRecord): number => {
+      const rawDate = record.date;
+      if (!rawDate) {
+        return Number.NEGATIVE_INFINITY;
+      }
+
+      const parsedDate = rawDate instanceof Date ? rawDate : new Date(rawDate);
+      const timestamp = parsedDate.getTime();
+      return Number.isNaN(timestamp) ? Number.NEGATIVE_INFINITY : timestamp;
+    };
+
+    const exercisePriority = (exerciseType?: ExerciseEnum): number => {
+      if (exerciseType === ExerciseEnum.SNATCH) {
+        return 0;
+      }
+
+      if (exerciseType === ExerciseEnum.CLEAN_AND_JERK) {
+        return 1;
+      }
+
+      return 2;
+    };
+
+    return [...records].sort((a, b) => {
+      const priorityA = exercisePriority(a.exerciseType);
+      const priorityB = exercisePriority(b.exerciseType);
+      const priorityDiff = priorityA - priorityB;
+      if (priorityDiff !== 0) {
+        return priorityDiff;
+      }
+
+      if (priorityA < 2 && priorityB < 2) {
+        const timestampDiff = toTimestamp(b) - toTimestamp(a);
+        if (timestampDiff !== 0) {
+          return timestampDiff;
+        }
+
+        return a.recordName.localeCompare(b.recordName, undefined, {
+          sensitivity: 'base',
+        });
+      }
+
+      const nameDiff = a.recordName.localeCompare(b.recordName, undefined, {
+        sensitivity: 'base',
+      });
+      if (nameDiff !== 0) {
+        return nameDiff;
+      }
+
+      return toTimestamp(b) - toTimestamp(a);
+    });
   }
 }
