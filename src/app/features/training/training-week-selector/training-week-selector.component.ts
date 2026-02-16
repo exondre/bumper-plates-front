@@ -1,4 +1,4 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { LocalStorageService } from '../../../service/local-storage.service';
 import { ExerciseEnum } from '../../../shared/enums/ExerciseEnum';
 import { LSKeysEnum } from '../../../shared/enums/LSKeysEnum';
@@ -22,13 +22,13 @@ import { Subscription } from 'rxjs';
   templateUrl: './training-week-selector.component.html',
   styleUrl: './training-week-selector.component.scss',
 })
-export class TrainingWeekSelectorComponent implements OnDestroy {
+export class TrainingWeekSelectorComponent implements OnDestroy, OnInit {
   storedWeeks: TrainingWeek[] = [];
   selectedWeek?: TrainingWeek;
   selectedSession?: TrainingSession;
 
   initialWeight: number = 20; // Peso inicial por defecto
-  initialWeightUnit: string = 'kg'; // Unidad de peso por defecto
+  initialWeightUnit: WeightUnitEnum = WeightUnitEnum.KG; // Unidad de peso por defecto
 
   barbellList: { value: number; unit: WeightUnitEnum }[] = [
     { value: 20, unit: WeightUnitEnum.KG },
@@ -36,7 +36,7 @@ export class TrainingWeekSelectorComponent implements OnDestroy {
     { value: 45, unit: WeightUnitEnum.LBS },
     { value: 35, unit: WeightUnitEnum.LBS },
   ];
-  selectedBarbell: { value: number; unit: string } | null = null;
+  selectedBarbell: { value: number; unit: WeightUnitEnum } | null = null;
 
   showWeekLoader: boolean = false;
 
@@ -48,6 +48,7 @@ export class TrainingWeekSelectorComponent implements OnDestroy {
 
   private weekSub: Subscription;
   private sessionSub: Subscription;
+  private preferencesSub: Subscription = new Subscription();
 
   constructor(
     private localStorageService: LocalStorageService,
@@ -85,6 +86,17 @@ Si eliges no recuperar, podrás seguir usando la app, pero algunas funcionalidad
       JSON.parse(
         this.localStorageService.getItem(LSKeysEnum.PERSONAL_RECORDS)
       ) || '[]';
+
+    this.preferencesSub = this.sharedService.getPreferences().subscribe(preferences => {
+      if (preferences.preferredBarbell) {
+        this.selectedBarbell = preferences.preferredBarbell;
+        return;
+      }
+
+      if (!this.selectedBarbell) {
+        this.selectedBarbell = this.getDefaultBarbell();
+      }
+    });
   }
 
   selectWeek(week: TrainingWeek) {
@@ -141,9 +153,23 @@ Si eliges no recuperar, podrás seguir usando la app, pero algunas funcionalidad
     this.sharedService.setSelectedSession(session);
   }
 
-  selectBarbell(barbell: { value: number; unit: string }) {
+  selectBarbell(barbell: { value: number; unit: WeightUnitEnum }) {
     this.selectedBarbell = barbell;
+    this.sharedService.updatePreferences({
+      preferredBarbell: barbell,
+    });
     this.closeCalculator();
+  }
+
+  /**
+   * Resolves the fallback barbell when no preference is stored.
+   */
+  private getDefaultBarbell(): { value: number; unit: WeightUnitEnum } {
+    const matchingBarbell = this.barbellList.find(barbell => (
+      barbell.value === this.initialWeight && barbell.unit === this.initialWeightUnit
+    ));
+
+    return matchingBarbell ?? this.barbellList[0];
   }
 
   getPersonalRecordForType(
@@ -226,5 +252,6 @@ Si eliges no recuperar, podrás seguir usando la app, pero algunas funcionalidad
     this.sharedService.setSelectedSession(this.selectedSession ?? null);
     this.weekSub.unsubscribe();
     this.sessionSub.unsubscribe();
+    this.preferencesSub.unsubscribe();
   }
 }

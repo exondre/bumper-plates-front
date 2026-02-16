@@ -18,8 +18,10 @@ import { ExerciseEnum } from '../../shared/enums/ExerciseEnum';
 export class PersonalRecordsComponent implements OnDestroy, OnInit {
   personalRecords: PersonalRecord[] = [];
   showNewPR: boolean = false;
+  showAllRecords: boolean = false;
   showNewPRSubscription: Subscription;
   reloadPRSubscription: Subscription;
+  preferencesSubscription: Subscription = new Subscription();
   feedbackMessage: string | null = null;
   feedbackVariant: 'success' | 'danger' | 'warning' | 'info' = 'info';
   private feedbackResetTimeoutId: number | null = null;
@@ -43,12 +45,16 @@ export class PersonalRecordsComponent implements OnDestroy, OnInit {
   }
 
   ngOnInit(): void {
+    this.preferencesSubscription = this.sharedService.getPreferences().subscribe(preferences => {
+      this.showAllRecords = Boolean(preferences.showAllPersonalRecords);
+    });
     this.loadPersonalRecords();
   }
 
   ngOnDestroy(): void {
       this.showNewPRSubscription.unsubscribe();
       this.reloadPRSubscription.unsubscribe();
+      this.preferencesSubscription.unsubscribe();
       this.clearFeedbackTimeout();
   }
 
@@ -67,6 +73,16 @@ export class PersonalRecordsComponent implements OnDestroy, OnInit {
     const parsedRecords: PersonalRecord[] = storedValue ? JSON.parse(storedValue) : [];
 
     this.personalRecords = this.sortPersonalRecords(parsedRecords);
+  }
+
+  /**
+    * Updates the personal records visibility preference.
+   */
+  onShowAllRecordsToggle(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.sharedService.updatePreferences({
+      showAllPersonalRecords: input.checked,
+    });
   }
 
   sendToPercentageCalculator(ev: MouseEvent, p: any) {
@@ -170,6 +186,7 @@ export class PersonalRecordsComponent implements OnDestroy, OnInit {
     }
   }
 
+
   /**
    * Creates a descriptive filename for the exported personal records.
    */
@@ -232,7 +249,12 @@ export class PersonalRecordsComponent implements OnDestroy, OnInit {
       return 2;
     };
 
-    return [...records].sort((a, b) => {
+    const normalizedRecords = records.map(record => ({
+      ...record,
+      isLatest: false,
+    }));
+
+    const sortedRecords = [...normalizedRecords].sort((a, b) => {
       const priorityA = exercisePriority(a.exerciseType);
       const priorityB = exercisePriority(b.exerciseType);
       const priorityDiff = priorityA - priorityB;
@@ -260,5 +282,28 @@ export class PersonalRecordsComponent implements OnDestroy, OnInit {
 
       return toTimestamp(b) - toTimestamp(a);
     });
+
+    const latestByExercise = new Map<ExerciseEnum | undefined, {
+      timestamp: number;
+      record: PersonalRecord;
+    }>();
+
+    sortedRecords.forEach(record => {
+      const timestamp = toTimestamp(record);
+      if (timestamp === Number.NEGATIVE_INFINITY) {
+        return;
+      }
+
+      const existing = latestByExercise.get(record.exerciseType);
+      if (!existing || timestamp > existing.timestamp) {
+        latestByExercise.set(record.exerciseType, { timestamp, record });
+      }
+    });
+
+    latestByExercise.forEach(({ record }) => {
+      record.isLatest = true;
+    });
+
+    return sortedRecords;
   }
 }
