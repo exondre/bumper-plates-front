@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TrainingWeek } from '../training.interface';
@@ -6,7 +6,7 @@ import { TrainingService } from '../training.service';
 
 @Component({
   selector: 'app-training-csv-loader',
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule],
   templateUrl: './training-csv-loader.component.html',
   styleUrl: './training-csv-loader.component.scss',
 })
