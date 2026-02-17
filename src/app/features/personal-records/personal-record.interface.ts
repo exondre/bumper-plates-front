@@ -9,4 +9,6 @@ export interface PersonalRecord {
   exerciseType?: ExerciseEnum;
   /** ISO timestamp string or Date instance indicating when the record was logged. */
   date?: Date | string;
+  /** Indicates if this record is the latest for the associated exercise. */
+  isLatest?: boolean;
 }

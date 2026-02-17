@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component } from '@angular/core';
 import { ExerciseEnum } from '../../../shared/enums/ExerciseEnum';
 import { LSKeysEnum } from '../../../shared/enums/LSKeysEnum';
@@ -10,7 +10,7 @@ import { FormsModule } from '@angular/forms';
 
 @Component({
     selector: 'app-new-pr',
-    imports: [CommonModule, ExerciseLabelPipe, FormsModule],
+    imports: [ExerciseLabelPipe, FormsModule],
     templateUrl: './new-pr.component.html',
     styleUrl: './new-pr.component.scss'
 })

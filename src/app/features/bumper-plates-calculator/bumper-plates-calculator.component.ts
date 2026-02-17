@@ -17,6 +17,8 @@ export class BumperPlatesCalculatorComponent implements OnInit, OnDestroy {
   desiredWeightUnitInput = input<string>();
   externalInputModeInput = input<boolean>(false);
   listenPercentageEventsInput = input<boolean>(true);
+  /** Preferred plate unit to filter available bumpers. Change plates are always kept regardless. */
+  preferredPlatesUnitInput = input<string>();
   closedSignal = output<void>();
 
   externalInputMode: boolean = false;
@@ -79,7 +81,8 @@ export class BumperPlatesCalculatorComponent implements OnInit, OnDestroy {
       this.initialWeight,
       this.initialWeightUnit,
       this.desiredWeight,
-      this.desiredWeightUnit
+      this.desiredWeightUnit,
+      this.preferredPlatesUnitInput(),
     );
     this.requiredBumpers = result.requiredBumpers;
     this.achievedWeight = result.achievedWeight;
@@ -104,7 +107,8 @@ export class BumperPlatesCalculatorComponent implements OnInit, OnDestroy {
     initialWeight: number,
     initialUnit: string,
     desiredWeight: number,
-    desiredUnit: string
+    desiredUnit: string,
+    preferredPlatesUnit?: string,
   ) {
     let availableBumpers = [
       {
@@ -140,7 +144,7 @@ export class BumperPlatesCalculatorComponent implements OnInit, OnDestroy {
         bumperUnit: 'kg',
         bumperOriginalUnit: 'kg',
         bumperValue: 5,
-        bumperLimit: 2,
+        bumperLimit: 1,
       },
       {
         bumperName: '45 lbs',
@@ -183,6 +187,7 @@ export class BumperPlatesCalculatorComponent implements OnInit, OnDestroy {
         bumperOriginalUnit: 'kg',
         bumperValue: 2.5,
         bumperLimit: 0,
+        changePlate: true,
       },
       {
         bumperName: '2 kg',
@@ -190,6 +195,7 @@ export class BumperPlatesCalculatorComponent implements OnInit, OnDestroy {
         bumperOriginalUnit: 'kg',
         bumperValue: 2,
         bumperLimit: 0,
+        changePlate: true,
       },
       {
         bumperName: '1.5 kg',
@@ -197,6 +203,7 @@ export class BumperPlatesCalculatorComponent implements OnInit, OnDestroy {
         bumperOriginalUnit: 'kg',
         bumperValue: 1.5,
         bumperLimit: 0,
+        changePlate: true,
       },
       {
         bumperName: '1 kg',
@@ -204,6 +211,7 @@ export class BumperPlatesCalculatorComponent implements OnInit, OnDestroy {
         bumperOriginalUnit: 'kg',
         bumperValue: 1,
         bumperLimit: 0,
+        changePlate: true,
       },
       {
         bumperName: '0.5 kg',
@@ -211,6 +219,7 @@ export class BumperPlatesCalculatorComponent implements OnInit, OnDestroy {
         bumperOriginalUnit: 'kg',
         bumperValue: 0.5,
         bumperLimit: 0,
+        changePlate: true,
       },
     ];
 
@@ -221,12 +230,21 @@ export class BumperPlatesCalculatorComponent implements OnInit, OnDestroy {
     // Convert the desired weight to the same unit as the barbell
     if (desiredUnit === 'lbs') {
       desiredWeight *= this.sharedService.poundToKiloFactor; // Convert to kilograms
+    }
 
-      // Filter out bigger bumpers measured in kilograms
+    // Filter available bumpers by preferred plates unit; change plates are always kept
+    if (preferredPlatesUnit) {
+      availableBumpers = availableBumpers.filter(
+        (bumper) =>
+          bumper.changePlate === true ||
+          bumper.bumperOriginalUnit === preferredPlatesUnit,
+      );
+    } else if (desiredUnit === 'lbs') {
+      // Fallback: filter out large kg bumpers when desired unit is lbs and no preference is set
       availableBumpers = availableBumpers.filter(
         (bumper) =>
           bumper.bumperOriginalUnit === 'lbs' ||
-          (bumper.bumperOriginalUnit === 'kg' && bumper.bumperValue < 5)
+          (bumper.bumperOriginalUnit === 'kg' && bumper.bumperValue < 5),
       );
     }
 
