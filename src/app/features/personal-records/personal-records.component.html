@@ -40,28 +40,51 @@
 
     <ul class="list-group mb-4">
       @if (personalRecords.length > 0) {
-        @for (p of personalRecords; track p.recordName + '-' + p.recordUnit) {
+        @for (p of personalRecords; track p.recordName + '-'+ p.record + '-' + p.recordUnit + '-' + p.date) {
           @if (showAllRecords || p.isLatest) {
-            <li class="list-group-item d-flex align-items-center justify-content-between">
+            <li class="list-group-item d-flex flex-wrap align-items-center justify-content-between" 
+              (click)="sendToPercentageCalculator($event, p)">
               <div class="d-flex flex-column gap-2">
                 <span class="me-2 flex-fill">
                   <strong>
                     {{ p.recordName }}
-                    @if (p.date) {
-                      <small class="text-muted ms-1">({{ p.date | date:'dd/MM/yyyy' }})</small>
-                    }
                   </strong>
+                  @if (p.date) {
+                    <small class="text-muted ms-1">
+                      <i> ({{ p.date | date:'dd/MM/yyyy' }}) </i>
+                    </small>
+                  }
                 </span>
-                <div>
-                  <button class="btn btn-outline-primary btn-sm me-2" type="button" (click)="sendToPercentageCalculator($event, p)">
-                    <strong>{{ p.record }} {{ p.recordUnit }}</strong>
-                  </button>
-                  <button class="btn btn-danger btn-sm" title="Borrar marca" type="button" (click)="deletePR(p)">
-                    <!-- Borrar -->
-                    <i class="bi bi-trash"></i>
-                  </button>
-                </div>
+                <span class="me-2 flex-fill">
+                  <strong>{{ p.record }} {{ p.recordUnit }}</strong>
+                </span>
               </div>
+              <button class="btn btn-danger btn-sm" title="Borrar marca" type="button" (click)="deletePR(p); $event.stopPropagation();">
+                <i class="bi bi-trash"></i>
+              </button>
+              @if (selectedPR === p) {
+                <div class="d-flex flex-wrap gap-2 w-100 mt-3">
+                  @for (pc of percentageList; track pc.value) {
+                    <button type="button" class="btn btn-outline-secondary btn-sm" style="flex: 0 0 calc(25% - 0.375rem);"
+                      (click)="openCalculatorForPRAndPercentage(p, pc.value); $event.stopPropagation();">
+                      {{ pc.value }}%
+                    </button>
+                  }
+                </div>
+              }
+
+              @if (selectedCalculator?.exercise === p.exerciseType && selectedCalculator?.percentage === selectedPercentage) {
+                @let personalRecord =  p;
+                @let percentage = selectedPercentage; 
+                <div class="w-100">
+                  <app-bumper-plates-calculator (closedSignal)="closeCalculator()" [externalInputModeInput]="true"
+                    [initialWeightInput]="selectedBarbell?.value" [initialWeightUnitInput]="selectedBarbell?.unit"
+                    [desiredWeightInput]="getDesiredWeightForPercentage(personalRecord, percentage)"
+                    [desiredWeightUnitInput]="selectedBarbell?.unit ?? 'kg'"
+                    [preferredPlatesUnitInput]="preferredPlatesUnit">
+                  </app-bumper-plates-calculator>
+                </div>
+              }
             </li>
           }
         }

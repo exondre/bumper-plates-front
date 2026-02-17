@@ -5,6 +5,8 @@ import { TrainingSession, TrainingWeek } from '../features/training/training.int
 import { LocalStorageService } from './local-storage.service';
 import { LSKeysEnum } from '../shared/enums/LSKeysEnum';
 import { Preferences } from '../shared/interfaces/preferences.interface';
+import { PersonalRecord } from '../features/personal-records/personal-record.interface';
+import { WeightUnitEnum } from '../shared/enums/weight-unit.enum';
 
 @Injectable({
   providedIn: 'root'
@@ -119,5 +121,21 @@ export class SharedService {
    */
   private persistPreferences(preferences: Preferences): void {
     this.lsService.setItem(LSKeysEnum.BP_PREFERENCES, JSON.stringify(preferences));
+  }
+
+  getDesiredWeightForPercentage(pr: PersonalRecord, percentage: number, barbellWeightUnit: WeightUnitEnum | string): number {
+    const desiredWeight = pr && percentage ? (pr?.record! * percentage! / 100) : pr?.record ?? 20;
+
+    if (barbellWeightUnit === WeightUnitEnum.KG.toString() && pr.recordUnit === WeightUnitEnum.LBS) {
+      // Convertir de lbs a kg
+      return +(desiredWeight * this.poundToKiloFactor).toFixed(2);
+    }
+
+    if (barbellWeightUnit === WeightUnitEnum.LBS.toString() && pr.recordUnit === WeightUnitEnum.KG) {
+      // Convertir de kg a lbs
+      return +(desiredWeight * this.kiloToPoundFactor).toFixed(2);
+    }
+
+    return desiredWeight;
   }
 }

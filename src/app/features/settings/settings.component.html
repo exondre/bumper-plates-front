@@ -1,3 +1,50 @@
-<div class="container py-3">
-  <p>Configuraciones próximamente.</p>
+<div class="container">
+  <h2>Ajustes</h2>
+
+  <div class="mb-4">
+    <label class="form-label fw-bold">Barra preferida</label>
+    <div class="btn-group w-100" role="group" aria-label="Barra preferida">
+      @for (barbell of barbellList; track barbell.value + barbell.unit) {
+        <button
+          type="button"
+          class="btn btn-outline-secondary"
+          [class.active]="selectedBarbell?.value === barbell.value && selectedBarbell?.unit === barbell.unit"
+          (click)="selectBarbell(barbell)">
+          {{ barbell.value }} {{ barbell.unit }}
+        </button>
+      }
+    </div>
+  </div>
+
+  <div class="mb-4">
+    <label class="form-label fw-bold">Unidad de discos</label>
+    <div class="btn-group w-100" role="group" aria-label="Unidad de discos">
+      @for (unit of platesUnitList; track unit) {
+        <button
+          type="button"
+          class="btn btn-outline-secondary"
+          [class.active]="selectedPlatesUnit === unit"
+          (click)="selectPlatesUnit(unit)">
+          {{ unit }}
+        </button>
+      }
+    </div>
+  </div>
+
+  <div class="mb-4">
+    <label class="form-label fw-bold">Marcas personales</label>
+    <div class="btn-group w-100" role="group" aria-label="Visualización de marcas">
+      @for (option of marksDisplayOptions; track option.value) {
+        <button
+          type="button"
+          class="btn btn-outline-secondary"
+          [class.active]="showAllRecords === option.value"
+          (click)="selectMarksDisplay(option.value)">
+          {{ option.label }}
+        </button>
+      }
+    </div>
+  </div>
+
+  <p class="text-center text-muted mt-5">Desarrollado en 🇨🇱. Versión {{ version }}.</p>
 </div>

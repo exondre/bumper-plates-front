@@ -38,6 +38,9 @@ export class TrainingWeekSelectorComponent implements OnDestroy, OnInit {
   ];
   selectedBarbell: { value: number; unit: WeightUnitEnum } | null = null;
 
+  /** User's preferred weight unit for plates suggestions. */
+  preferredPlatesUnit?: WeightUnitEnum;
+
   showWeekLoader: boolean = false;
 
   personalRecords: PersonalRecord[] = [];
@@ -90,12 +93,11 @@ Si eliges no recuperar, podrás seguir usando la app, pero algunas funcionalidad
     this.preferencesSub = this.sharedService.getPreferences().subscribe(preferences => {
       if (preferences.preferredBarbell) {
         this.selectedBarbell = preferences.preferredBarbell;
-        return;
-      }
-
-      if (!this.selectedBarbell) {
+      } else if (!this.selectedBarbell) {
         this.selectedBarbell = this.getDefaultBarbell();
       }
+
+      this.preferredPlatesUnit = preferences.preferredPlatesUnits;
     });
   }
 

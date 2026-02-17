@@ -90,7 +90,8 @@
           <app-bumper-plates-calculator (closedSignal)="closeCalculator()" [externalInputModeInput]="true"
             [initialWeightInput]="selectedBarbell?.value" [initialWeightUnitInput]="selectedBarbell?.unit"
             [desiredWeightInput]="getDesiredWeightForSet(pr!, setCalc, selectedBarbell!.unit)"
-            [desiredWeightUnitInput]="selectedBarbell?.unit ?? 'kg'">
+            [desiredWeightUnitInput]="selectedBarbell?.unit ?? 'kg'"
+            [preferredPlatesUnitInput]="preferredPlatesUnit">
           </app-bumper-plates-calculator>
         </div>
         }

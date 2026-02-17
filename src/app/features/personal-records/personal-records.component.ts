@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { SharedService } from '../../service/shared.service';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
@@ -8,14 +8,18 @@ import { NewPrComponent } from './new-pr/new-pr.component';
 import { PersonalRecord } from './personal-record.interface';
 import { DataSyncResource, DataSyncService } from '../../service/data-sync.service';
 import { ExerciseEnum } from '../../shared/enums/ExerciseEnum';
+import { BumperPlatesCalculatorComponent } from '../bumper-plates-calculator/bumper-plates-calculator.component';
+import { WeightUnitEnum } from '../../shared/enums/weight-unit.enum';
 
 @Component({
     selector: 'app-personal-records',
-    imports: [CommonModule, NewPrComponent],
+    imports: [CommonModule, BumperPlatesCalculatorComponent, NewPrComponent],
     templateUrl: './personal-records.component.html',
     styleUrl: './personal-records.component.scss'
 })
 export class PersonalRecordsComponent implements OnDestroy, OnInit {
+  private sharedService = inject(SharedService);
+
   personalRecords: PersonalRecord[] = [];
   showNewPR: boolean = false;
   showAllRecords: boolean = false;
@@ -26,10 +30,39 @@ export class PersonalRecordsComponent implements OnDestroy, OnInit {
   feedbackVariant: 'success' | 'danger' | 'warning' | 'info' = 'info';
   private feedbackResetTimeoutId: number | null = null;
 
+  selectedPR: PersonalRecord | null = null;
+  selectedPercentage: number | null = null;
+
+  percentageList = [
+    { label: '50%', value: 50 },
+    { label: '55%', value: 55 },
+    { label: '60%', value: 60 },
+    { label: '65%', value: 65 },
+    { label: '70%', value: 70 },
+    { label: '75%', value: 75 },
+    { label: '80%', value: 80 },
+    { label: '85%', value: 85 },
+    { label: '90%', value: 90 },
+    { label: '95%', value: 95 },
+    { label: '100%', value: 100 },
+    { label: '105%', value: 105 },
+  ]
+
+  selectedBarbell: { value: number; unit: WeightUnitEnum } | null = null;
+
+  /** User's preferred weight unit for plates suggestions. */
+  preferredPlatesUnit?: WeightUnitEnum;
+
+  private preferencesSub: Subscription = new Subscription();
+
+  selectedCalculator: {
+    exercise: ExerciseEnum;
+    percentage: number;
+  } | null = null;
+
   @ViewChild('importFileInput') importFileInput?: ElementRef<HTMLInputElement>;
 
   constructor(
-    private sharedService: SharedService,
     private lsService: LocalStorageService,
     private dataSyncService: DataSyncService,
   ) {
@@ -49,12 +82,24 @@ export class PersonalRecordsComponent implements OnDestroy, OnInit {
       this.showAllRecords = Boolean(preferences.showAllPersonalRecords);
     });
     this.loadPersonalRecords();
+
+    this.preferencesSub = this.sharedService.getPreferences().subscribe(preferences => {
+      if (preferences.preferredBarbell) {
+        this.selectedBarbell = preferences.preferredBarbell;
+      } else if (!this.selectedBarbell) {
+        this.selectedBarbell = { value: 20, unit: WeightUnitEnum.KG };
+      }
+
+      this.preferredPlatesUnit = preferences.preferredPlatesUnits;
+    });
+
   }
 
   ngOnDestroy(): void {
       this.showNewPRSubscription.unsubscribe();
       this.reloadPRSubscription.unsubscribe();
       this.preferencesSubscription.unsubscribe();
+      this.preferencesSub.unsubscribe();
       this.clearFeedbackTimeout();
   }
 
@@ -88,7 +133,34 @@ export class PersonalRecordsComponent implements OnDestroy, OnInit {
   sendToPercentageCalculator(ev: MouseEvent, p: any) {
     ev.preventDefault();
     this.sharedService.sendSelectedPREvent(p);
-    // console.log(`${weight} ${unit}.`);
+    this.selectPR(p);
+  }
+
+  selectPR(pr: PersonalRecord) {
+    this.selectedPercentage = null;
+    if (this.selectedPR === pr) {
+      this.selectedPR = null;
+      return;
+    }
+    this.selectedPR = pr;
+  }
+
+  async openCalculatorForPRAndPercentage(pr: PersonalRecord, percentage: number) {
+    this.closeCalculator();
+    
+    if (this.selectedPercentage === percentage) {
+      this.selectedPercentage = null;
+      return;
+    }
+
+    await new Promise(resolve => setTimeout(resolve));
+
+    this.selectedPercentage = percentage;
+    this.selectedCalculator = {exercise: pr!.exerciseType!, percentage};
+  }
+
+  closeCalculator() {
+    this.selectedCalculator = null;
   }
 
   /**
@@ -306,4 +378,9 @@ export class PersonalRecordsComponent implements OnDestroy, OnInit {
 
     return sortedRecords;
   }
+
+  getDesiredWeightForPercentage(pr: PersonalRecord, percentage: number): number {
+    return this.sharedService.getDesiredWeightForPercentage(pr, percentage, this.selectedBarbell?.unit ?? WeightUnitEnum.KG);
+  }
+
 }

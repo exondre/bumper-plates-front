@@ -12,4 +12,7 @@ export interface Preferences {
         value: number;
         unit: WeightUnitEnum;
     }
+
+    /** User's preferred weight unit for bumper plates suggestions. */
+    preferredPlatesUnits?: WeightUnitEnum;
 }

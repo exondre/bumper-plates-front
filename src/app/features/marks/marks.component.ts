@@ -10,39 +10,9 @@ import { Subscription } from 'rxjs';
   selector: 'app-marks',
   imports: [
     PersonalRecordsComponent,
-    PercentageCalculatorComponent,
-    BumperPlatesCalculatorComponent
 ],
   templateUrl: './marks.component.html',
   styleUrl: './marks.component.scss',
 })
-export class MarksComponent implements OnDestroy {
-  showPercentageCalc = false;
-  showPlatesCalc = false;
-
-  private prSub: Subscription;
-  private percSub: Subscription;
-
-  constructor(private sharedService: SharedService) {
-    this.prSub = this.sharedService
-      .getSelectedPREvent()
-      .subscribe((pr) => {
-        if (pr) {
-          this.showPercentageCalc = true;
-          this.showPlatesCalc = false;
-        }
-      });
-    this.percSub = this.sharedService
-      .getSelectedPercentageEvent()
-      .subscribe((p) => {
-        if (p) {
-          this.showPlatesCalc = true;
-        }
-      });
-  }
-
-  ngOnDestroy(): void {
-    this.prSub.unsubscribe();
-    this.percSub.unsubscribe();
-  }
+export class MarksComponent {
 }
