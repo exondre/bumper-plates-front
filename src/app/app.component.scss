@@ -61,16 +61,19 @@ nav {
 
 header {
   &.navbar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
     background: var(--bs-body-bg);
-    // padding-top: calc(.5rem + env(safe-area-inset-top));
-    padding-top: calc(env(safe-area-inset-top));
-    
+    padding-top: env(safe-area-inset-top);
   }
 
   &.custom-header {
-    background-color: rgba(var(--bs-body-bg-rgb), 0.72) !important;
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
-    backdrop-filter: blur(20px) saturate(180%);
+    background-color: rgba(var(--bs-body-bg-rgb), 0.2) !important;
+    -webkit-backdrop-filter: blur(5px) saturate(180%);
+    backdrop-filter: blur(5px) saturate(180%);
     font-weight: 500;
   }
 }
@@ -80,12 +83,11 @@ header {
   min-height: 0;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  padding-top: calc(1rem);
   padding-bottom: calc(4.5rem + max(env(safe-area-inset-bottom), 8px));
 }
 
 .has-header {
-  // No padding-top needed — header is in normal flex flow
+  padding-top: calc(4rem + env(safe-area-inset-top));
 }
 
 .no-header {
