@@ -4,7 +4,14 @@ html,
 body {
   overscroll-behavior: none;
   -webkit-tap-highlight-color: transparent;
-  height: 100vh;
+  height: 100dvh;
+}
+
+@media (display-mode: standalone) {
+  html,
+  body {
+    height: 100vh;
+  }
 }
 
 // Dark mode para liquid glass

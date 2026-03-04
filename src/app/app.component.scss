@@ -1,7 +1,11 @@
 :host {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: 100dvh;
+
+  @media (display-mode: standalone) {
+    height: 100vh;
+  }
   overflow: hidden;
   position: relative;
 }
@@ -38,9 +42,9 @@ nav {
     box-shadow:
       0 4px 24px rgba(0, 0, 0, 0.12),
       0 1px 0 rgba(255, 255, 255, 0.9) inset;
-    background-color: rgba(255, 255, 255, 0.72) !important;
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
-    backdrop-filter: blur(20px) saturate(180%);
+    background-color: rgba(var(--bs-body-bg-rgb), 0.2) !important;
+    -webkit-backdrop-filter: blur(5px) saturate(180%);
+    backdrop-filter: blur(5px) saturate(180%);
     font-weight: 700;
 
     .nav-link {
@@ -58,7 +62,9 @@ nav {
 header {
   &.navbar {
     background: var(--bs-body-bg);
-    padding-top: calc(.5rem + env(safe-area-inset-top));
+    // padding-top: calc(.5rem + env(safe-area-inset-top));
+    padding-top: calc(env(safe-area-inset-top));
+    
   }
 
   &.custom-header {
@@ -74,6 +80,7 @@ header {
   min-height: 0;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  padding-top: calc(1rem);
   padding-bottom: calc(4.5rem + max(env(safe-area-inset-bottom), 8px));
 }
 
