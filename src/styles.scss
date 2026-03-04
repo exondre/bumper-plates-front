@@ -1,1 +1,18 @@
 /* You can add global styles to this file, and also import other style files */
+
+html,
+body {
+  overscroll-behavior: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+// Dark mode para liquid glass
+@media (prefers-color-scheme: dark) {
+  nav.custom-nav {
+    background-color: rgba(30, 30, 32, 0.75) !important;
+    border-color: rgba(255, 255, 255, 0.12) !important;
+    box-shadow:
+      0 4px 24px rgba(0, 0, 0, 0.45),
+      0 1px 0 rgba(255, 255, 255, 0.08) inset !important;
+  }
+}

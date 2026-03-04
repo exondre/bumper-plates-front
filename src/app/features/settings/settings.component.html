@@ -46,5 +46,20 @@
     </div>
   </div>
 
+  <div class="mb-4">
+    <label class="form-label fw-bold">Apariencia</label>
+    <div class="btn-group w-100" role="group" aria-label="Apariencia">
+      @for (option of colorSchemeOptions; track option.value) {
+        <button
+          type="button"
+          class="btn btn-outline-secondary"
+          [class.active]="selectedColorScheme === option.value"
+          (click)="selectColorScheme(option.value)">
+          {{ option.label }}
+        </button>
+      }
+    </div>
+  </div>
+
   <p class="text-center text-muted mt-5">Desarrollado en 🇨🇱. Versión {{ version }}.</p>
 </div>

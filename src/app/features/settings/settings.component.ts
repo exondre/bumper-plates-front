@@ -44,6 +44,16 @@ export class SettingsComponent implements OnInit, OnDestroy {
   /** Whether to show all personal records or only the latest ones. */
   showAllRecords: boolean = false;
 
+  /** Available color scheme options. */
+  colorSchemeOptions: { label: string; value: 'auto' | 'light' | 'dark' }[] = [
+    { label: 'Sistema', value: 'auto' },
+    { label: 'Claro',   value: 'light' },
+    { label: 'Oscuro',  value: 'dark' },
+  ];
+
+  /** Currently selected color scheme. */
+  selectedColorScheme: 'auto' | 'light' | 'dark' = 'auto';
+
   private preferencesSub: Subscription = new Subscription();
 
   constructor(private sharedService: SharedService) {}
@@ -55,6 +65,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
       this.selectedPlatesUnit = preferences.preferredPlatesUnits
         ?? WeightUnitEnum.KG;
       this.showAllRecords = Boolean(preferences.showAllPersonalRecords);
+      this.selectedColorScheme = preferences.colorScheme ?? 'auto';
     });
   }
 
@@ -80,6 +91,11 @@ export class SettingsComponent implements OnInit, OnDestroy {
   selectMarksDisplay(showAll: boolean): void {
     this.showAllRecords = showAll;
     this.sharedService.updatePreferences({ showAllPersonalRecords: showAll });
+  }
+
+  selectColorScheme(scheme: 'auto' | 'light' | 'dark'): void {
+    this.selectedColorScheme = scheme;
+    this.sharedService.updatePreferences({ colorScheme: scheme });
   }
 
   ngOnDestroy(): void {

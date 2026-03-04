@@ -1,9 +1,14 @@
 {
   "name": "Bumper Plates",
   "short_name": "Bumper Plates",
+  "id": "/",
+  "lang": "es",
   "theme_color": "#ffffff",
   "background_color": "#ffffff",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "portrait-primary",
+  "categories": ["health", "fitness", "sports"],
   "scope": "./",
   "start_url": "./",
   "icons": [

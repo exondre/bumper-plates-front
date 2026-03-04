@@ -15,4 +15,7 @@ export interface Preferences {
 
     /** User's preferred weight unit for bumper plates suggestions. */
     preferredPlatesUnits?: WeightUnitEnum;
+
+    /** User's preferred color scheme. */
+    colorScheme?: 'auto' | 'light' | 'dark';
 }

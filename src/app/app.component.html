@@ -9,12 +9,12 @@
 <main class="app-content" [ngClass]="{ 'has-header': !hideHeader, 'no-header': hideHeader }">
   <router-outlet></router-outlet>
 </main>
-<nav class="nav custom-nav nav-pills nav-fill flex-nowrap fixed-bottom bg-light border-top">
+<nav class="nav custom-nav nav-pills nav-fill flex-nowrap fixed-bottom bg-light">
   <a class="nav-link d-flex flex-column align-items-center justify-content-center" routerLink="/home" routerLinkActive="active" aria-label="Inicio">
     <i class="bi bi-house"></i>
     <span>Home</span>
   </a>
-  <a class="nav-link d-none d-flex flex-column align-items-center justify-content-center" routerLink="/entrenamientos" routerLinkActive="active" aria-label="Entrenamientos">
+  <a class="nav-link d-none" routerLink="/entrenamientos" routerLinkActive="active" aria-label="Entrenamientos">
     <i class="bi bi-calendar-check"></i>
     <span>Entrenamientos</span>
   </a>

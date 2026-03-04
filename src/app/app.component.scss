@@ -1,13 +1,11 @@
 nav {
   font-size: 0.8rem;
-  height: calc(4rem);
-  height: calc(4rem);
-  margin-bottom: max(constant(safe-area-inset-bottom), 10px);
-  margin-bottom: max(env(safe-area-inset-bottom), 10px);
+  margin-bottom: 0;
 
   .nav-link {
     padding: 0.25rem 0.25rem;
     min-width: 0;
+    min-height: 44px;
 
     span {
       display: block;
@@ -19,22 +17,32 @@ nav {
   }
 
   &.custom-nav {
-    border-radius: 50px;
-    padding: .15rem;
+    // Posicionamiento: flotar sobre el home indicator
+    bottom: max(env(safe-area-inset-bottom), 8px) !important;
     margin-left: .85rem;
     margin-right: .85rem;
-    background-color: rgba(var(--bs-light-rgb), 0.5) !important;
-    -webkit-backdrop-filter: blur(1.5px);
-    backdrop-filter: blur(1.5px);
+
+    // Liquid Glass - estilo iOS 26
+    border-radius: 50px;
+    padding: .25rem .25rem;
+    height: 4rem;
+    border: 0.5px solid rgba(255, 255, 255, 0.6);
+    box-shadow:
+      0 4px 24px rgba(0, 0, 0, 0.12),
+      0 1px 0 rgba(255, 255, 255, 0.9) inset;
+    background-color: rgba(255, 255, 255, 0.72) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    backdrop-filter: blur(20px) saturate(180%);
     font-weight: 700;
 
     .nav-link {
       border-radius: 50px !important;
+      transition: background-color 0.15s ease;
 
       &.active {
-        background-color: rgba(13, 110, 253, 0.8);
+        background-color: rgba(13, 110, 253, 0.85);
+        box-shadow: 0 1px 4px rgba(13, 110, 253, 0.3);
       }
-
     }
   }
 }
@@ -42,26 +50,24 @@ nav {
 header {
   &.navbar {
     background: var(--bs-body-bg);
-    padding-top: calc(.5rem + constant(safe-area-inset-top));
     padding-top: calc(.5rem + env(safe-area-inset-top));
   }
 
   &.custom-header {
-    background-color: rgba(var(--bs-body-bg-rgb),0.5)!important;
-    -webkit-backdrop-filter: blur(1.5px);
-    backdrop-filter: blur(1.5px);
+    background-color: rgba(var(--bs-body-bg-rgb), 0.72) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    backdrop-filter: blur(20px) saturate(180%);
     font-weight: 500;
   }
 }
 
 .app-content {
-  padding-bottom: calc(4rem + constant(safe-area-inset-bottom)); // space for bottom nav
-  padding-bottom: calc(4rem + env(safe-area-inset-bottom));
+  // El nav pill flota a max(safe-area-inset-bottom, 8px) desde el borde
+  // y mide 4rem. El contenido necesita espacio para ambos.
+  padding-bottom: calc(4rem + max(env(safe-area-inset-bottom), 8px) + 0.5rem);
 }
 
 .has-header {
-  // space for fixed header including safe area on notched devices
-  padding-top: calc(4rem + constant(safe-area-inset-top));
   padding-top: calc(4rem + env(safe-area-inset-top));
 }
 

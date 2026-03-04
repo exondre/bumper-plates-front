@@ -39,7 +39,7 @@
 
 h1 {
   font-size: 3.125rem;
-  color: var(--gray-900);
+  color: var(--bs-body-color);
   font-weight: 500;
   line-height: 100%;
   letter-spacing: -0.125rem;
@@ -51,19 +51,18 @@ h1 {
 
 p {
   margin: 0;
-  color: var(--gray-700);
+  color: var(--bs-secondary-color);
 }
 
 main {
   width: 100%;
-  min-height: calc(100dvh - 4rem - constant(safe-area-inset-bottom));
   min-height: calc(100dvh - 4rem - env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
   padding: 1rem;
-  padding-bottom: calc(1rem + constant(safe-area-inset-bottom));
+  padding-top: calc(1rem + env(safe-area-inset-top));
   padding-bottom: calc(1rem + env(safe-area-inset-bottom));
   box-sizing: inherit;
 }
@@ -98,6 +97,6 @@ main {
 
 .version-text {
   margin-bottom: 0.5rem;
-  color: var(--gray-700);
+  color: var(--bs-secondary-color);
   font-size: 0.875rem;
 }
