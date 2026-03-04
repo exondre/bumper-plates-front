@@ -56,7 +56,7 @@ p {
 
 main {
   width: 100%;
-  min-height: calc(100dvh - 4rem - env(safe-area-inset-bottom));
+  min-height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;

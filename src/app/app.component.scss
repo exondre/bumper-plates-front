@@ -1,3 +1,11 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+}
+
 nav {
   font-size: 0.8rem;
   margin-bottom: 0;
@@ -17,10 +25,10 @@ nav {
   }
 
   &.custom-nav {
-    // Posicionamiento: flotar sobre el home indicator
-    bottom: max(env(safe-area-inset-bottom), 8px) !important;
-    margin-left: .85rem;
-    margin-right: .85rem;
+    position: absolute !important;
+    bottom: max(env(safe-area-inset-bottom), 8px);
+    left: .85rem;
+    right: .85rem;
 
     // Liquid Glass - estilo iOS 26
     border-radius: 50px;
@@ -62,13 +70,15 @@ header {
 }
 
 .app-content {
-  // El nav pill flota a max(safe-area-inset-bottom, 8px) desde el borde
-  // y mide 4rem. El contenido necesita espacio para ambos.
-  padding-bottom: calc(4rem + max(env(safe-area-inset-bottom), 8px) + 0.5rem);
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: calc(4.5rem + max(env(safe-area-inset-bottom), 8px));
 }
 
 .has-header {
-  padding-top: calc(4rem + env(safe-area-inset-top));
+  // No padding-top needed — header is in normal flex flow
 }
 
 .no-header {
