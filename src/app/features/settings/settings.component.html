@@ -61,5 +61,29 @@
     </div>
   </div>
 
+  <div class="mb-4">
+    <label class="form-label fw-bold">Datos</label>
+    <input
+      #importFileInput
+      type="file"
+      accept="application/json"
+      class="d-none"
+      (change)="onImportFileSelected($event)"
+    >
+    @if (feedbackMessage) {
+      <div class="alert alert-{{ feedbackVariant }} mb-3" role="alert">
+        {{ feedbackMessage }}
+      </div>
+    }
+    <div class="d-flex gap-2">
+      <button type="button" class="btn btn-outline-secondary flex-fill" (click)="exportPersonalRecords()">
+        <i class="bi bi-box-arrow-up me-1"></i> Exportar marcas
+      </button>
+      <button type="button" class="btn btn-outline-secondary flex-fill" (click)="triggerImport()">
+        <i class="bi bi-box-arrow-in-down me-1"></i> Importar marcas
+      </button>
+    </div>
+  </div>
+
   <p class="text-center text-muted mt-5">Desarrollado en 🇨🇱. Versión {{ version }}.</p>
 </div>

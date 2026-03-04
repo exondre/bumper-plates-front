@@ -1,12 +1,40 @@
 <main class="main">
-  <div class="content">
-    <div class="left-side">
-      <div class="logo">
-        <img [src]="'../../assets/icons/icon.svg'" alt="app-logo" />
+  <div class="hero">
+    <img src="assets/icons/icon.svg" alt="app-logo" class="hero-logo" />
+    <h1>Bumper Plates</h1>
+    <p class="subtitle">Tu app para ayudarte a levantar mejor</p>
+  </div>
+
+  @if (latestRecords.length > 0) {
+    <section class="section">
+      <h2>Mis mejores marcas</h2>
+      <div class="records-grid">
+        @for (pr of latestRecords; track pr.recordName + pr.record) {
+          <div class="record-card">
+            <span class="record-exercise">{{ (pr.exerciseType ?? '') | exerciseLabel }}</span>
+            <span class="record-weight">{{ pr.record }} {{ pr.recordUnit }}</span>
+            <span class="record-name">{{ pr.recordName }}</span>
+            @if (pr.date) {
+              <span class="record-date">{{ pr.date | date:'dd/MM/yyyy' }}</span>
+            }
+          </div>
+        }
       </div>
-      <h1>{{ title }}</h1>
-      <p>{{ subtitle }}</p>
-    </div>
-</div>
-  <p class="version-text">Desarrollado en 🇨🇱. Versión {{ version }}.</p>
+    </section>
+  } @else {
+    <section class="section">
+      <div class="empty-state">
+        <p>Aun no tienes marcas personales.</p>
+        <a routerLink="/marcas" class="btn btn-outline-primary">Registrar mi primera marca</a>
+      </div>
+    </section>
+  }
+
+  <section class="section">
+    <a routerLink="/calculadora" class="btn btn-primary w-100 quick-calc-btn">
+      <i class="bi bi-calculator me-2"></i> Ir a la calculadora
+    </a>
+  </section>
+
+  <p class="version-text">Desarrollado en 🇨🇱. Version {{ version }}.</p>
 </main>

@@ -1,7 +1,7 @@
 <div class="container">
   <div class="card mx-auto shadow">
     <div class="card-header bg-primary text-white text-center">
-      <h4 class="mb-0">Registrando nueva marca...</h4>
+      <h4 class="mb-0">{{ isEditMode ? 'Editando marca...' : 'Registrando nueva marca...' }}</h4>
     </div>
     <div class="card-body">
       <form (ngSubmit)="saveNewRecord()" autocomplete="off">
