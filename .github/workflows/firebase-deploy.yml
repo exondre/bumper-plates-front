@@ -12,9 +12,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: npm
@@ -22,7 +22,7 @@ jobs:
       - run: npm ci
       - run: npm run build
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: build-output
           path: dist/
@@ -32,9 +32,9 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v7
         with:
           name: build-output
           path: dist/
@@ -45,3 +45,22 @@ jobs:
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_BUMPER_PLATES }}
           channelId: live
           projectId: bumper-plates
+
+  purge:
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Purge Cloudflare cache by hosts
+        env:
+          CF_ZONE_ID: ${{ secrets.CF_ZONE }}
+          CF_API_TOKEN: ${{ secrets.CF_CACHE_PURGE_TOKEN }}
+          CF_PURGE_HOSTS: ${{ secrets.CF_PURGE_HOSTS }}
+        run: |
+          echo "Purging cache for hosts: ${CF_PURGE_HOSTS}"
+          for i in 1 2 3; do
+            curl -sS -X POST "https://api.cloudflare.com/client/v4/zones/${CF_ZONE_ID}/purge_cache" \
+              -H "Authorization: Bearer ${CF_API_TOKEN}" \
+              -H "Content-Type: application/json" \
+              --data "{\"hosts\": ${CF_PURGE_HOSTS}}" && break
+            echo "Retry $i..."; sleep 3
+          done
