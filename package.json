@@ -1,8 +1,11 @@
 {
   "name": "bumper-plates-front",
-  "version": "0.12.2",
+  "version": "0.13.0",
   "scripts": {
     "ng": "ng",
+    "sync:ngsw-version": "node scripts/sync-ngsw-version.mjs",
+    "sync:ngsw-version:check": "node scripts/sync-ngsw-version.mjs --check",
+    "prebuild": "npm run sync:ngsw-version",
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",

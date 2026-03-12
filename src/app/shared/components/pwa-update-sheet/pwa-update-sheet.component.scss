@@ -1,0 +1,63 @@
+:host {
+  position: absolute;
+  left: 0.85rem;
+  right: 0.85rem;
+  bottom: calc(max(env(safe-area-inset-bottom), 8px) + 4rem + 0.75rem);
+  z-index: 20;
+}
+
+.pwa-update-sheet {
+  border-radius: 1rem;
+  border: 1px solid rgba(var(--bs-border-color-rgb), 0.85);
+  background-color: rgba(var(--bs-body-bg-rgb), 0.9);
+  box-shadow: 0 12px 28px rgba(var(--bs-emphasis-color-rgb), 0.15);
+  -webkit-backdrop-filter: blur(10px) saturate(170%);
+  backdrop-filter: blur(10px) saturate(170%);
+  padding: 1rem;
+}
+
+.update-copy {
+  margin-bottom: 0.9rem;
+}
+
+.sheet-title {
+  color: var(--bs-emphasis-color);
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.sheet-description {
+  color: var(--bs-secondary-color);
+  font-size: 0.9rem;
+  margin: 0.4rem 0 0;
+}
+
+.sheet-version {
+  color: var(--bs-secondary-color);
+  font-size: 0.8rem;
+  margin: 0.35rem 0 0;
+}
+
+.sheet-actions {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.sheet-button {
+  min-height: 44px;
+  font-weight: 600;
+  flex: 1;
+}
+
+.updating-status {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  width: 100%;
+  color: var(--bs-secondary-color);
+  font-weight: 600;
+}
