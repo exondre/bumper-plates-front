@@ -1,8 +1,8 @@
-name: Cloudflare Purge after Pages deploy
+name: Cloudflare Purge after Firebase deploy
 
 on:
   workflow_run:
-    workflows: ["pages-build-deployment"]
+    workflows: ["Deploy to Firebase Hosting"]
     types: [completed]
 
 concurrency:
