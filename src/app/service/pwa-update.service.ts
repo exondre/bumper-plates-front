@@ -48,7 +48,7 @@ export class PwaUpdateService {
           latestHash: this.updateStateSubject.value.latestHash,
           latestVersionLabel: this.updateStateSubject.value.latestVersionLabel,
         });
-        this.reloadPage();
+        setTimeout(() => this.reloadPage(), 1500);
       }),
     );
 

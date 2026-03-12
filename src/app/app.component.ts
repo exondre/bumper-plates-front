@@ -18,6 +18,7 @@ export class AppComponent implements OnDestroy {
   readonly pwaUpdateState$ = this.pwaUpdateService.updateState$;
   private darkModeQuery: MediaQueryList | null = null;
   private darkModeListener: ((e: MediaQueryListEvent) => void) | null = null;
+  private darkModeListenerActive = false;
   private preferencesSub: Subscription = new Subscription();
 
   constructor(
@@ -40,19 +41,19 @@ export class AppComponent implements OnDestroy {
   private initDarkMode(): void {
     this.darkModeQuery = window.matchMedia('(prefers-color-scheme: dark)');
     this.darkModeListener = (e: MediaQueryListEvent) => this.applyTheme(e.matches);
-    this.darkModeQuery.addEventListener('change', this.darkModeListener);
   }
 
   private applyColorScheme(scheme: 'auto' | 'light' | 'dark' | undefined): void {
     if (!scheme || scheme === 'auto') {
       this.applyTheme(this.darkModeQuery?.matches ?? false);
-      if (this.darkModeQuery && this.darkModeListener) {
-        this.darkModeQuery.removeEventListener('change', this.darkModeListener);
+      if (this.darkModeQuery && this.darkModeListener && !this.darkModeListenerActive) {
         this.darkModeQuery.addEventListener('change', this.darkModeListener);
+        this.darkModeListenerActive = true;
       }
     } else {
-      if (this.darkModeQuery && this.darkModeListener) {
+      if (this.darkModeQuery && this.darkModeListener && this.darkModeListenerActive) {
         this.darkModeQuery.removeEventListener('change', this.darkModeListener);
+        this.darkModeListenerActive = false;
       }
       document.documentElement.setAttribute('data-bs-theme', scheme);
     }
@@ -77,8 +78,9 @@ export class AppComponent implements OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this.darkModeQuery && this.darkModeListener) {
+    if (this.darkModeQuery && this.darkModeListener && this.darkModeListenerActive) {
       this.darkModeQuery.removeEventListener('change', this.darkModeListener);
+      this.darkModeListenerActive = false;
     }
     this.preferencesSub.unsubscribe();
   }

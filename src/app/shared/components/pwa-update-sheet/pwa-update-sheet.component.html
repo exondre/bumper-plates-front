@@ -3,38 +3,62 @@
     class="pwa-update-sheet"
     role="region"
     aria-live="polite"
-    aria-label="Nueva versión disponible"
+    [attr.aria-label]="isError() ? 'Error al actualizar' : 'Nueva versión disponible'"
   >
-    <div class="update-copy">
-      <h2 class="sheet-title">Nueva versión disponible</h2>
-      <p class="sheet-description">Hay mejoras y correcciones listas para ti.</p>
-      @if (updateVersionLabel(); as versionLabel) {
-        <p class="sheet-version">Versión nueva: {{ versionLabel }}</p>
-      }
-    </div>
-    @if (isUpdating()) {
-      <div class="updating-status" role="status" aria-live="polite">
-        <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
-        <span>Actualizando...</span>
+    @if (isError()) {
+      <div class="update-copy">
+        <h2 class="sheet-title">Error al actualizar</h2>
+        <p class="sheet-description">No se pudo aplicar la actualización. Intenta de nuevo.</p>
       </div>
-    } @else {
       <div class="sheet-actions">
         <button
           type="button"
           class="btn btn-outline-secondary sheet-button"
           (click)="onDismissClick()"
         >
-          Más tarde
+          Cerrar
         </button>
 
         <button
           type="button"
           class="btn btn-primary sheet-button"
-          (click)="onAcceptClick()"
+          (click)="onRetryClick()"
         >
-          Actualizar ahora
+          Reintentar
         </button>
       </div>
+    } @else {
+      <div class="update-copy">
+        <h2 class="sheet-title">Nueva versión disponible</h2>
+        <p class="sheet-description">Hay mejoras y correcciones listas para ti.</p>
+        @if (updateVersionLabel(); as versionLabel) {
+          <p class="sheet-version">Versión nueva: {{ versionLabel }}</p>
+        }
+      </div>
+      @if (isUpdating()) {
+        <div class="updating-status" role="status" aria-live="polite">
+          <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+          <span>Actualizando...</span>
+        </div>
+      } @else {
+        <div class="sheet-actions">
+          <button
+            type="button"
+            class="btn btn-outline-secondary sheet-button"
+            (click)="onDismissClick()"
+          >
+            Más tarde
+          </button>
+
+          <button
+            type="button"
+            class="btn btn-primary sheet-button"
+            (click)="onAcceptClick()"
+          >
+            Actualizar ahora
+          </button>
+        </div>
+      }
     }
   </section>
 }

@@ -33,10 +33,12 @@
 </nav>
 @if (pwaUpdateState$ | async; as pwaUpdateState) {
   <app-pwa-update-sheet
-    [visible]="pwaUpdateState.status === 'available' || pwaUpdateState.status === 'activating'"
+    [visible]="pwaUpdateState.status === 'available' || pwaUpdateState.status === 'activating' || pwaUpdateState.status === 'error'"
     [isUpdating]="pwaUpdateState.status === 'activating'"
+    [isError]="pwaUpdateState.status === 'error'"
     [updateVersionLabel]="pwaUpdateState.latestVersionLabel"
     (dismiss)="onDismissPwaUpdate()"
     (accept)="onAcceptPwaUpdate()"
+    (retry)="onAcceptPwaUpdate()"
   ></app-pwa-update-sheet>
 }

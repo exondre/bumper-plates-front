@@ -10,9 +10,11 @@ import { ChangeDetectionStrategy, Component, input, output } from '@angular/core
 export class PwaUpdateSheetComponent {
   readonly visible = input<boolean>(false);
   readonly isUpdating = input<boolean>(false);
+  readonly isError = input<boolean>(false);
   readonly updateVersionLabel = input<string | null>(null);
   readonly dismiss = output<void>();
   readonly accept = output<void>();
+  readonly retry = output<void>();
 
   /**
    * Emits the dismiss action for the current update prompt.
@@ -34,5 +36,12 @@ export class PwaUpdateSheetComponent {
     }
 
     this.accept.emit();
+  }
+
+  /**
+   * Emits the retry action after a failed update attempt.
+   */
+  onRetryClick(): void {
+    this.retry.emit();
   }
 }
