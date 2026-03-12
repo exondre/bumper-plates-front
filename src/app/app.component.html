@@ -31,3 +31,12 @@
     <span>Ajustes</span>
   </a>
 </nav>
+@if (pwaUpdateState$ | async; as pwaUpdateState) {
+  <app-pwa-update-sheet
+    [visible]="pwaUpdateState.status === 'available' || pwaUpdateState.status === 'activating'"
+    [isUpdating]="pwaUpdateState.status === 'activating'"
+    [updateVersionLabel]="pwaUpdateState.latestVersionLabel"
+    (dismiss)="onDismissPwaUpdate()"
+    (accept)="onAcceptPwaUpdate()"
+  ></app-pwa-update-sheet>
+}

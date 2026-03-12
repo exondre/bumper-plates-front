@@ -4,20 +4,27 @@ import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { SharedService } from './service/shared.service';
+import { PwaUpdateService } from './service/pwa-update.service';
+import { PwaUpdateSheetComponent } from './shared/components/pwa-update-sheet/pwa-update-sheet.component';
 
 @Component({
   selector: 'app-root',
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, PwaUpdateSheetComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })
 export class AppComponent implements OnDestroy {
   hideHeader = false;
+  readonly pwaUpdateState$ = this.pwaUpdateService.updateState$;
   private darkModeQuery: MediaQueryList | null = null;
   private darkModeListener: ((e: MediaQueryListEvent) => void) | null = null;
   private preferencesSub: Subscription = new Subscription();
 
-  constructor(private router: Router, private sharedService: SharedService) {
+  constructor(
+    private router: Router,
+    private sharedService: SharedService,
+    private pwaUpdateService: PwaUpdateService,
+  ) {
     this.hideHeader = this.router.url === '/home';
     this.router.events
       .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))
@@ -53,6 +60,20 @@ export class AppComponent implements OnDestroy {
 
   private applyTheme(isDark: boolean): void {
     document.documentElement.setAttribute('data-bs-theme', isDark ? 'dark' : 'light');
+  }
+
+  /**
+   * Dismisses the current update prompt for the active session.
+   */
+  onDismissPwaUpdate(): void {
+    this.pwaUpdateService.dismissForSession();
+  }
+
+  /**
+   * Accepts the available update and starts the activation flow.
+   */
+  onAcceptPwaUpdate(): void {
+    void this.pwaUpdateService.acceptUpdate();
   }
 
   ngOnDestroy(): void {
