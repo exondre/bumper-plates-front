@@ -25,6 +25,13 @@ Reference file for UI/UX conventions that took iteration to get right.
 </nav>
 ```
 
+### PWA update sheet
+- Rendered at root level in `app.component.html`, after the `<nav>`.
+- z-index: 20 (above header at 10, above nav).
+- Must handle three visible states: `available`, `activating`, and `error`.
+- Positioned absolutely above the tab bar with safe-area-aware bottom offset.
+- Styled with the same glassmorphism pattern as header and nav.
+
 ### `hideHeader` logic
 - The header is **only hidden on `/home`**.
 - Computed in the constructor and on each `NavigationEnd` event.

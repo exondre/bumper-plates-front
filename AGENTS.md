@@ -59,6 +59,14 @@ The codebase is transitioning from decorator-based to signal-based APIs. Follow 
 - Use descriptive commit messages and include gitmojis accordingly
 - Commit messages must be written exclusively in english
 
+## Pitfalls
+
+- **Subscription cleanup**: every `.subscribe()` must be stored and unsubscribed — in components via `Subscription.add()` + `ngOnDestroy`, in tests via `afterEach`. No floating subscriptions.
+- **Service states → UI**: if a service exposes a state (e.g., `status: 'idle' | 'available' | 'error'`), the consuming template must handle **every** value. Silent state transitions that hide UI leave users without feedback.
+- **addEventListener lifecycle**: track registration with a boolean flag. Never call `removeEventListener` + `addEventListener` back-to-back on the same reference — it is redundant and fragile.
+- **Firebase Hosting header order**: when multiple header rules match the same file, the **last** matching rule wins for duplicate keys. Place specific no-cache overrides (for `index.html`, `ngsw-worker.js`, `ngsw.json`, `manifest.webmanifest`) **after** generic glob cache rules in `firebase.json`.
+- **PWA cache-busting**: service worker entry points (`ngsw-worker.js`, `ngsw.json`) and `index.html` must **never** receive `immutable` caching. This breaks the update mechanism entirely.
+
 ## UI Language
 
 - All user-facing strings are in **Spanish**. Do not introduce English strings in the UI.
