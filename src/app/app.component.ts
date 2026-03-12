@@ -27,9 +27,11 @@ export class AppComponent implements OnDestroy {
     private pwaUpdateService: PwaUpdateService,
   ) {
     this.hideHeader = this.router.url === '/home';
-    this.router.events
-      .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))
-      .subscribe((e) => { this.hideHeader = e.urlAfterRedirects === '/home'; });
+    this.preferencesSub.add(
+      this.router.events
+        .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))
+        .subscribe((e) => { this.hideHeader = e.urlAfterRedirects === '/home'; }),
+    );
 
     this.initDarkMode();
 

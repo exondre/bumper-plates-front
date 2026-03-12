@@ -1,11 +1,11 @@
 # UI Conventions — Bumper Plates
 
-Archivo de referencia para convenciones UI/UX que costaron iterar.
-**Leer antes de tocar layout, nav, header o safe areas.**
+Reference file for UI/UX conventions that took iteration to get right.
+**Read this before touching layout, nav, header, or safe areas.**
 
 ---
 
-## 1. Shell de la app (app.component)
+## 1. App shell (app.component)
 
 ### Template (`app.component.html`)
 ```html
@@ -25,37 +25,37 @@ Archivo de referencia para convenciones UI/UX que costaron iterar.
 </nav>
 ```
 
-### Lógica de `hideHeader`
-- El header **solo se oculta en `/home`**.
-- Se calcula en el constructor y en cada `NavigationEnd`.
-- `/home` tiene su propio hero, no necesita header global.
+### `hideHeader` logic
+- The header is **only hidden on `/home`**.
+- Computed in the constructor and on each `NavigationEnd` event.
+- `/home` has its own hero; it does not need the global header.
 
 ---
 
-## 2. Estilos del shell (`app.component.scss`)
+## 2. Shell styles (`app.component.scss`)
 
-### Layout raíz
+### Root layout
 ```scss
 :host {
   display: flex;
   flex-direction: column;
-  height: 100dvh;              // dvh para browsers modernos
+  height: 100dvh;              // dvh for modern browsers
   @media (display-mode: standalone) {
-    height: 100vh;             // PWA standalone usa vh clásico
+    height: 100vh;             // PWA standalone uses classic vh
   }
-  overflow: hidden;            // el scroll ocurre dentro de .app-content
+  overflow: hidden;            // scrolling happens inside .app-content
   position: relative;
 }
 ```
 
-**Por qué `overflow: hidden` en :host:**
-En PWA modo standalone, sin esto el viewport se extiende debajo del home indicator de iOS y aparece scroll fantasma en el shell.
+**Why `overflow: hidden` on :host:**
+In PWA standalone mode, without this the viewport extends below the iOS home indicator and a ghost scroll appears on the shell.
 
-### Área de contenido scrollable
+### Scrollable content area
 ```scss
 .app-content {
   flex: 1;
-  min-height: 0;                // imprescindible para que flex child scrollee
+  min-height: 0;                // required for flex child to scroll
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   padding-bottom: calc(4.5rem + max(env(safe-area-inset-bottom), 8px));
@@ -70,11 +70,11 @@ En PWA modo standalone, sin esto el viewport se extiende debajo del home indicat
 }
 ```
 
-**Por qué `min-height: 0`:** un flex child no puede ser más pequeño que su contenido sin esto. Sin él, el child crece y el scroll nunca activa.
+**Why `min-height: 0`:** a flex child cannot shrink below its content size without this. Without it, the child grows and scroll never activates.
 
-**Por qué `4rem` en has-header:** el header mide ~56px (navbar estándar Bootstrap) + safe-area-inset-top. `4rem = 64px` da un pequeño colchón para que el contenido no quede tapado.
+**Why `4rem` in has-header:** the header is ~56px (standard Bootstrap navbar) + safe-area-inset-top. `4rem = 64px` adds a small buffer so content is not hidden behind the header.
 
-**Por qué `4.5rem` en padding-bottom:** el nav tiene `height: 4rem`. El 0.5rem extra es colchón para que el último elemento de la lista no quede justo bajo el borde del nav.
+**Why `4.5rem` in padding-bottom:** the nav is `height: 4rem`. The extra 0.5rem ensures the last list item is not flush against the nav edge.
 
 ### Header
 ```scss
@@ -86,7 +86,7 @@ header {
     right: 0;
     z-index: 10;
     background: var(--bs-body-bg);
-    padding-top: env(safe-area-inset-top);   // respeta notch/dynamic island
+    padding-top: env(safe-area-inset-top);   // respects notch/dynamic island
   }
 
   &.custom-header {
@@ -98,13 +98,13 @@ header {
 }
 ```
 
-**Por qué `position: absolute` en header:** para que el glassmorphism funcione (el contenido se ve a través). Si fuera `position: sticky` o static, bloquearía el scroll.
+**Why `position: absolute` on header:** required for glassmorphism (content is visible through it). `position: sticky` or static would block scroll.
 
-### Tab bar (nav flotante)
+### Floating tab bar (nav)
 ```scss
 nav.custom-nav {
   position: absolute !important;
-  bottom: max(env(safe-area-inset-bottom), 8px);   // nunca toca el borde en iPhone X+
+  bottom: max(env(safe-area-inset-bottom), 8px);   // never touches edge on iPhone X+
   left: .85rem;
   right: .85rem;
 
@@ -126,70 +126,70 @@ nav.custom-nav {
     transition: background-color 0.15s ease;
 
     &.active {
-      background-color: rgba(13, 110, 253, 0.85);   // azul Bootstrap semitransparente
+      background-color: rgba(13, 110, 253, 0.85);   // semi-transparent Bootstrap blue
       box-shadow: 0 1px 4px rgba(13, 110, 253, 0.3);
     }
   }
 }
 ```
 
-**Por qué `position: absolute` y no `fixed`:** en PWA standalone iOS, `position: fixed` puede tener comportamiento errático con el teclado virtual. `absolute` en un :host con `height: 100dvh; overflow: hidden` es equivalente y más predecible.
+**Why `position: absolute` and not `fixed`:** in PWA standalone on iOS, `position: fixed` can behave erratically with the virtual keyboard. `absolute` inside a `:host` with `height: 100dvh; overflow: hidden` is equivalent and more predictable.
 
-**Por qué `max(env(safe-area-inset-bottom), 8px)`:** en iPhones sin notch `safe-area-inset-bottom = 0`, quedaría pegado al borde. El mínimo de `8px` da margen visual.
+**Why `max(env(safe-area-inset-bottom), 8px)`:** on iPhones without a notch `safe-area-inset-bottom = 0`, so the nav would sit flush against the edge. The `8px` minimum provides visual breathing room.
 
-**Por qué `!important` en background-color del nav:** Bootstrap agrega estilos inline de fondo al `.nav`. Sin `!important` el glassmorphism no funciona.
+**Why `!important` on nav background-color:** Bootstrap injects inline background styles on `.nav`. Without `!important` the glassmorphism effect does not apply.
 
 ---
 
-## 3. Safe areas — regla general
+## 3. Safe areas — general rules
 
-| Elemento | Propiedad | Valor |
+| Element | Property | Value |
 |---|---|---|
 | Header | padding-top | `env(safe-area-inset-top)` |
 | .has-header | padding-top | `calc(4rem + env(safe-area-inset-top))` |
 | .app-content | padding-bottom | `calc(4.5rem + max(env(safe-area-inset-bottom), 8px))` |
 | Nav | bottom | `max(env(safe-area-inset-bottom), 8px)` |
-| Páginas con scroll propio (home, etc.) | padding-bottom | `calc(env(safe-area-inset-bottom))` — no sumar el nav porque .app-content ya lo hace |
+| Pages with own scroll (home, etc.) | padding-bottom | `calc(env(safe-area-inset-bottom))` — do not add nav height; `.app-content` already handles it |
 
-**Regla clave:** el padding-bottom del nav ya está absorbido por `.app-content`. Los componentes **no deben agregar** padding-bottom adicional para el nav — solo para su propio safe-area si tienen scroll interno.
+**Key rule:** the nav padding-bottom is already absorbed by `.app-content`. Components **must not add** extra padding-bottom for the nav — only for their own internal safe-area if they have inner scroll.
 
 ---
 
 ## 4. Dark mode
 
-- Controlado por `data-bs-theme` en `<html>` (`light` | `dark`).
-- Bootstrap 5 cambia todas sus variables CSS automáticamente.
-- Preferencia en `SharedService` → `Preferences.colorScheme` → `LocalStorage`.
-- Los componentes usan variables Bootstrap (`var(--bs-body-bg)`, `var(--bs-border-color)`, etc.) y heredan dark mode sin esfuerzo.
-- **Nunca usar colores hardcodeados** en componentes; usar siempre variables Bootstrap o `var(--bs-*)`.
+- Controlled by `data-bs-theme` on `<html>` (`light` | `dark`).
+- Bootstrap 5 automatically updates all its CSS variables.
+- Preference stored in `SharedService` → `Preferences.colorScheme` → `LocalStorage`.
+- Components use Bootstrap variables (`var(--bs-body-bg)`, `var(--bs-border-color)`, etc.) and inherit dark mode automatically.
+- **Never hardcode colors** in components; always use Bootstrap variables or `var(--bs-*)`.
 
 ---
 
-## 5. Convenciones de componentes
+## 5. Component conventions
 
-### Páginas (routes)
-- Usan `.container` de Bootstrap para max-width y padding horizontal.
-- **No** agregan padding-top propio (ya lo maneja `.has-header`).
-- **No** agregan padding-bottom propio para el nav (ya lo maneja `.app-content`).
+### Pages (routes)
+- Use Bootstrap's `.container` for max-width and horizontal padding.
+- **Do not** add their own padding-top (`.has-header` handles it).
+- **Do not** add their own padding-bottom for the nav (`.app-content` handles it).
 
-### Home (excepción)
-- No usa `.container` — layout propio con flexbox.
-- Agrega `padding-top: calc(1rem + env(safe-area-inset-top))` porque no tiene header global.
-- `padding-bottom: calc(env(safe-area-inset-bottom))` — el `.app-content` ya maneja el espacio del nav.
+### Home (exception)
+- Does not use `.container` — custom flexbox layout.
+- Adds `padding-top: calc(1rem + env(safe-area-inset-top))` because there is no global header.
+- `padding-bottom: calc(env(safe-area-inset-bottom))` — `.app-content` already handles nav space.
 
-### Tabs del nav
-- Estructura: `<a class="nav-link d-flex flex-column align-items-center justify-content-center">`
-- Icono Bootstrap Icons arriba, `<span>` con label abajo.
-- `min-height: 44px` en `.nav-link` para cumplir tamaño mínimo táctil de Apple.
-- Tab de Entrenamientos tiene `d-none` (oculto por ahora, no eliminar).
+### Nav tabs
+- Structure: `<a class="nav-link d-flex flex-column align-items-center justify-content-center">`
+- Bootstrap Icons icon on top, `<span>` with label below.
+- `min-height: 44px` on `.nav-link` to meet Apple's minimum touch target size.
+- The Entrenamientos tab has `d-none` (hidden for now — do not remove it).
 
 ---
 
-## 6. Qué NO hacer
+## 6. What NOT to do
 
-- **No usar `position: fixed`** en la nav — usar `absolute` dentro del :host overflow:hidden.
-- **No agregar scroll** al `:host` de los componentes hoja — el scroll es responsabilidad de `.app-content`.
-- **No hardcodear colores** — usar variables CSS de Bootstrap.
-- **No mover Export/Import de vuelta a Marcas** — pertenecen a Ajustes.
-- **No remover `!important`** del background del nav sin probar en Safari/PWA.
-- **No cambiar `height: 100dvh`** sin probar en iOS Safari y en modo standalone.
+- **Do not use `position: fixed`** on the nav — use `absolute` inside the `:host` overflow:hidden container.
+- **Do not add scroll** to the `:host` of leaf components — scrolling is the responsibility of `.app-content`.
+- **Do not hardcode colors** — use Bootstrap CSS variables.
+- **Do not move Export/Import back to Marcas** — they belong in Ajustes.
+- **Do not remove `!important`** from the nav background without testing on Safari/PWA.
+- **Do not change `height: 100dvh`** without testing on iOS Safari and in standalone mode.

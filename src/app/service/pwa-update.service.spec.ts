@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { SwUpdate } from '@angular/service-worker';
-import { Subject } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import { PwaUpdateService, PwaUpdateState } from './pwa-update.service';
 
 class SwUpdateMock {
@@ -15,6 +15,7 @@ describe('PwaUpdateService', () => {
   let service: PwaUpdateService;
   let swUpdateMock: SwUpdateMock;
   let latestState: PwaUpdateState;
+  let stateSub: Subscription;
 
   beforeEach(() => {
     sessionStorage.clear();
@@ -33,9 +34,13 @@ describe('PwaUpdateService', () => {
       latestHash: null,
       latestVersionLabel: null,
     };
-    service.updateState$.subscribe(state => {
+    stateSub = service.updateState$.subscribe(state => {
       latestState = state;
     });
+  });
+
+  afterEach(() => {
+    stateSub.unsubscribe();
   });
 
   it('should expose an available state when VERSION_READY is emitted', () => {
