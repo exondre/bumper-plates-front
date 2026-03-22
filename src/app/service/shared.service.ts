@@ -7,6 +7,19 @@ import { LSKeysEnum } from '../shared/enums/LSKeysEnum';
 import { Preferences } from '../shared/interfaces/preferences.interface';
 import { PersonalRecord } from '../features/personal-records/personal-record.interface';
 import { WeightUnitEnum } from '../shared/enums/weight-unit.enum';
+import { ExerciseEnum } from '../shared/enums/ExerciseEnum';
+
+export interface MarksViewCalculatorState {
+  exercise: ExerciseEnum;
+  percentage: number;
+}
+
+export interface MarksViewState {
+  selectedRecordKey: string | null;
+  selectedPercentage: number | null;
+  selectedCalculator: MarksViewCalculatorState | null;
+  scrollTop: number;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -16,6 +29,12 @@ export class SharedService {
   private showNewPR = new Subject<any>();
   private reloadPR = new Subject<boolean>();
   private selectedPR = new BehaviorSubject<any>(null);
+  private marksViewState = new BehaviorSubject<MarksViewState>({
+    selectedRecordKey: null,
+    selectedPercentage: null,
+    selectedCalculator: null,
+    scrollTop: 0,
+  });
   private selectedWeek = new BehaviorSubject<TrainingWeek | null>(null);
   private selectedSession = new BehaviorSubject<TrainingSession | null>(null);
   private preferences = new BehaviorSubject<Preferences>({
@@ -59,6 +78,42 @@ export class SharedService {
 
   getSelectedPREvent() {
     return this.selectedPR.asObservable();
+  }
+
+  /**
+   * Returns an observable with the in-memory state for the marks tab.
+   */
+  getMarksViewState() {
+    return this.marksViewState.asObservable();
+  }
+
+  /**
+   * Returns the current in-memory marks tab state snapshot.
+   */
+  getMarksViewStateSnapshot(): MarksViewState {
+    return this.marksViewState.value;
+  }
+
+  /**
+   * Patches the in-memory marks tab state.
+   */
+  patchMarksViewState(patch: Partial<MarksViewState>): void {
+    this.marksViewState.next({
+      ...this.marksViewState.value,
+      ...patch,
+    });
+  }
+
+  /**
+   * Resets the in-memory marks tab state.
+   */
+  resetMarksViewState(): void {
+    this.marksViewState.next({
+      selectedRecordKey: null,
+      selectedPercentage: null,
+      selectedCalculator: null,
+      scrollTop: 0,
+    });
   }
 
   setSelectedWeek(week: TrainingWeek | null) {

@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy } from '@angular/core';
-import { NavigationEnd, Router, RouterModule } from '@angular/router';
+import { AfterViewInit, Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
+import { NavigationEnd, NavigationStart, Router, RouterModule } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { SharedService } from './service/shared.service';
@@ -13,13 +13,16 @@ import { PwaUpdateSheetComponent } from './shared/components/pwa-update-sheet/pw
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })
-export class AppComponent implements OnDestroy {
+export class AppComponent implements AfterViewInit, OnDestroy {
+  @ViewChild('appContent') appContentRef?: ElementRef<HTMLElement>;
+
   hideHeader = false;
   readonly pwaUpdateState$ = this.pwaUpdateService.updateState$;
   private darkModeQuery: MediaQueryList | null = null;
   private darkModeListener: ((e: MediaQueryListEvent) => void) | null = null;
   private darkModeListenerActive = false;
-  private preferencesSub: Subscription = new Subscription();
+  private subscriptions = new Subscription();
+  private previousUrl = '';
 
   constructor(
     private router: Router,
@@ -27,17 +30,33 @@ export class AppComponent implements OnDestroy {
     private pwaUpdateService: PwaUpdateService,
   ) {
     this.hideHeader = this.router.url === '/home';
-    this.preferencesSub.add(
+    this.previousUrl = this.router.url;
+    this.subscriptions.add(
       this.router.events
-        .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))
-        .subscribe((e) => { this.hideHeader = e.urlAfterRedirects === '/home'; }),
+        .pipe(filter((e): e is NavigationStart | NavigationEnd => e instanceof NavigationStart || e instanceof NavigationEnd))
+        .subscribe((event) => {
+          if (event instanceof NavigationStart) {
+            this.captureMarksScrollPosition(this.previousUrl);
+            return;
+          }
+
+          this.hideHeader = event.urlAfterRedirects === '/home';
+          this.restoreMarksScrollPosition(event.urlAfterRedirects);
+          this.previousUrl = event.urlAfterRedirects;
+        }),
     );
 
     this.initDarkMode();
 
-    this.preferencesSub = this.sharedService.getPreferences().subscribe(preferences => {
-      this.applyColorScheme(preferences.colorScheme);
-    });
+    this.subscriptions.add(
+      this.sharedService.getPreferences().subscribe(preferences => {
+        this.applyColorScheme(preferences.colorScheme);
+      }),
+    );
+  }
+
+  ngAfterViewInit(): void {
+    this.restoreMarksScrollPosition(this.router.url);
   }
 
   private initDarkMode(): void {
@@ -66,6 +85,50 @@ export class AppComponent implements OnDestroy {
   }
 
   /**
+   * Stores the current marcas tab scroll position before leaving the route.
+   */
+  private captureMarksScrollPosition(url: string): void {
+    if (!this.isMarksRoute(url)) {
+      return;
+    }
+
+    const appContent = this.appContentRef?.nativeElement;
+    if (!appContent) {
+      return;
+    }
+
+    this.sharedService.patchMarksViewState({
+      scrollTop: appContent.scrollTop,
+    });
+  }
+
+  /**
+   * Restores the marcas tab scroll position when returning to the route.
+   */
+  private restoreMarksScrollPosition(url: string): void {
+    if (!this.isMarksRoute(url)) {
+      return;
+    }
+
+    requestAnimationFrame(() => {
+      const appContent = this.appContentRef?.nativeElement;
+      if (!appContent) {
+        return;
+      }
+
+      appContent.scrollTop = this.sharedService.getMarksViewStateSnapshot().scrollTop;
+    });
+  }
+
+  /**
+   * Checks whether a URL corresponds to the marcas tab route.
+   */
+  private isMarksRoute(url: string): boolean {
+    const normalizedUrl = url.split('?')[0].split('#')[0];
+    return normalizedUrl === '/marcas';
+  }
+
+  /**
    * Dismisses the current update prompt for the active session.
    */
   onDismissPwaUpdate(): void {
@@ -80,10 +143,12 @@ export class AppComponent implements OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.captureMarksScrollPosition(this.previousUrl);
+
     if (this.darkModeQuery && this.darkModeListener && this.darkModeListenerActive) {
       this.darkModeQuery.removeEventListener('change', this.darkModeListener);
       this.darkModeListenerActive = false;
     }
-    this.preferencesSub.unsubscribe();
+    this.subscriptions.unsubscribe();
   }
 }

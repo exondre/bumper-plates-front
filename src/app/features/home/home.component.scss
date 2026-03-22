@@ -98,6 +98,24 @@ main {
   }
 }
 
+.record-card-button {
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    border-color: var(--bs-primary-border-subtle);
+  }
+
+  &:focus-visible {
+    outline: none;
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.2);
+  }
+}
+
 .empty-state {
   text-align: center;
   padding: 1.5rem 1rem;

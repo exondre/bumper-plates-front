@@ -1,23 +1,26 @@
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
-import { SharedService } from '../../service/shared.service';
 import { CommonModule } from '@angular/common';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { BumperPlatesCalculatorComponent } from '../bumper-plates-calculator/bumper-plates-calculator.component';
 import { LocalStorageService } from '../../service/local-storage.service';
+import { SharedService } from '../../service/shared.service';
 import { LSKeysEnum } from '../../shared/enums/LSKeysEnum';
+import { ExerciseEnum } from '../../shared/enums/ExerciseEnum';
+import { WeightUnitEnum } from '../../shared/enums/weight-unit.enum';
+import { MarksNavigationState, PersonalRecordNavigationSnapshot } from '../../shared/interfaces/marks-navigation-state.interface';
 import { NewPrComponent } from './new-pr/new-pr.component';
 import { PersonalRecord } from './personal-record.interface';
-import { ExerciseEnum } from '../../shared/enums/ExerciseEnum';
-import { BumperPlatesCalculatorComponent } from '../bumper-plates-calculator/bumper-plates-calculator.component';
-import { WeightUnitEnum } from '../../shared/enums/weight-unit.enum';
 
 @Component({
-    selector: 'app-personal-records',
-    imports: [CommonModule, BumperPlatesCalculatorComponent, NewPrComponent],
-    templateUrl: './personal-records.component.html',
-    styleUrl: './personal-records.component.scss'
+  selector: 'app-personal-records',
+  imports: [CommonModule, BumperPlatesCalculatorComponent, NewPrComponent],
+  templateUrl: './personal-records.component.html',
+  styleUrl: './personal-records.component.scss',
 })
 export class PersonalRecordsComponent implements OnDestroy, OnInit {
   private sharedService = inject(SharedService);
+  private router = inject(Router);
 
   personalRecords: PersonalRecord[] = [];
   showNewPR: boolean = false;
@@ -27,7 +30,6 @@ export class PersonalRecordsComponent implements OnDestroy, OnInit {
   reloadPRSubscription: Subscription;
   preferencesSubscription: Subscription = new Subscription();
   selectedPR: PersonalRecord | null = null;
-  selectedPercentage: number | null = null;
 
   percentageList = [
     { label: '50%', value: 50 },
@@ -42,7 +44,7 @@ export class PersonalRecordsComponent implements OnDestroy, OnInit {
     { label: '95%', value: 95 },
     { label: '100%', value: 100 },
     { label: '105%', value: 105 },
-  ]
+  ];
 
   selectedBarbell: { value: number; unit: WeightUnitEnum } | null = null;
 
@@ -50,23 +52,24 @@ export class PersonalRecordsComponent implements OnDestroy, OnInit {
   preferredPlatesUnit?: WeightUnitEnum;
 
   private preferencesSub: Subscription = new Subscription();
-
-  selectedCalculator: {
-    exercise: ExerciseEnum;
-    percentage: number;
-  } | null = null;
+  private readonly calculatorPanelSelector = '[data-marks-calculator-panel="true"]';
+  private readonly selectedRecordSelector = '[data-selected-record="true"]';
+  private pendingNavigationState: MarksNavigationState | null = null;
+  private shouldScrollToSelectedRecord = false;
 
   constructor(
     private lsService: LocalStorageService,
   ) {
-    this.showNewPRSubscription = this.sharedService.getShowNewPR().subscribe( s => {
+    this.pendingNavigationState = this.getMarksNavigationStateFromCurrentNavigation();
+
+    this.showNewPRSubscription = this.sharedService.getShowNewPR().subscribe(s => {
       this.showNewPR = s;
       if (!s) {
         this.editingRecord = null;
       }
     });
 
-    this.reloadPRSubscription = this.sharedService.getReloadPR().subscribe( r => {
+    this.reloadPRSubscription = this.sharedService.getReloadPR().subscribe(r => {
       if (r) {
         this.loadPersonalRecords();
       }
@@ -92,37 +95,40 @@ export class PersonalRecordsComponent implements OnDestroy, OnInit {
   }
 
   ngOnDestroy(): void {
-      this.showNewPRSubscription.unsubscribe();
-      this.reloadPRSubscription.unsubscribe();
-      this.preferencesSubscription.unsubscribe();
-      this.preferencesSub.unsubscribe();
+    this.showNewPRSubscription.unsubscribe();
+    this.reloadPRSubscription.unsubscribe();
+    this.preferencesSubscription.unsubscribe();
+    this.preferencesSub.unsubscribe();
   }
 
-  addNewPR() {
+  addNewPR(): void {
     this.editingRecord = null;
     this.showNewPR = true;
   }
 
-  editPR(pr: PersonalRecord) {
+  editPR(pr: PersonalRecord): void {
     this.editingRecord = pr;
     this.showNewPR = true;
   }
 
-  deletePR(pr: PersonalRecord) {
+  deletePR(pr: PersonalRecord): void {
     const confirmed = window.confirm(`¿Borrar "${pr.recordName}"?`);
     if (!confirmed) {
       return;
     }
-    const newPR = this.personalRecords.filter( (p: any) => p !== pr);
+    const newPR = this.personalRecords.filter((p: PersonalRecord) => p !== pr);
     this.lsService.setItem(LSKeysEnum.PERSONAL_RECORDS, JSON.stringify(newPR));
     this.loadPersonalRecords();
   }
 
-  loadPersonalRecords() {
+  loadPersonalRecords(): void {
     const storedValue = this.lsService.getItem(LSKeysEnum.PERSONAL_RECORDS);
     const parsedRecords: PersonalRecord[] = storedValue ? JSON.parse(storedValue) : [];
 
     this.personalRecords = this.sortPersonalRecords(parsedRecords);
+    this.applyNavigationPreselectionIfNeeded();
+    this.restoreMarksViewState();
+    this.scrollSelectedRecordIfNeeded();
   }
 
   /**
@@ -135,37 +141,169 @@ export class PersonalRecordsComponent implements OnDestroy, OnInit {
     });
   }
 
-  sendToPercentageCalculator(ev: MouseEvent, p: any) {
+  sendToPercentageCalculator(ev: MouseEvent, p: PersonalRecord): void {
     ev.preventDefault();
     this.sharedService.sendSelectedPREvent(p);
     this.selectPR(p);
   }
 
-  selectPR(pr: PersonalRecord) {
-    this.selectedPercentage = null;
-    if (this.selectedPR === pr) {
+  /**
+   * Selects a personal record and clears percentage/calculator selections when switching records.
+   */
+  selectPR(pr: PersonalRecord): void {
+    const recordKey = this.getPersonalRecordKey(pr);
+    const isAlreadySelected = this.selectedRecordKey === recordKey;
+
+    if (isAlreadySelected) {
       this.selectedPR = null;
+      this.sharedService.patchMarksViewState({
+        selectedRecordKey: null,
+        selectedPercentage: null,
+        selectedCalculator: null,
+      });
       return;
     }
+
     this.selectedPR = pr;
+    this.sharedService.patchMarksViewState({
+      selectedRecordKey: recordKey,
+      selectedPercentage: null,
+      selectedCalculator: null,
+    });
   }
 
-  async openCalculatorForPRAndPercentage(pr: PersonalRecord, percentage: number) {
-    this.closeCalculator();
-    
-    if (this.selectedPercentage === percentage) {
-      this.selectedPercentage = null;
+  /**
+   * Opens the bumpers calculator for the selected record and percentage.
+   */
+  openCalculatorForPRAndPercentage(pr: PersonalRecord, percentage: number): void {
+    const selectedCalculator = this.selectedCalculator;
+    const isSameActiveCalculatorSelection = !!selectedCalculator
+      && this.selectedPercentage === percentage
+      && selectedCalculator.percentage === percentage
+      && selectedCalculator.exercise === pr.exerciseType;
+
+    if (isSameActiveCalculatorSelection) {
+      this.sharedService.patchMarksViewState({
+        selectedPercentage: null,
+        selectedCalculator: null,
+      });
       return;
     }
 
-    await new Promise(resolve => setTimeout(resolve));
+    this.selectedPR = pr;
+    this.sharedService.patchMarksViewState({
+      selectedRecordKey: this.getPersonalRecordKey(pr),
+      selectedPercentage: percentage,
+      selectedCalculator: {
+        exercise: pr.exerciseType!,
+        percentage,
+      },
+    });
 
-    this.selectedPercentage = percentage;
-    this.selectedCalculator = {exercise: pr!.exerciseType!, percentage};
+    this.scrollCalculatorPanelIfNeeded();
   }
 
-  closeCalculator() {
-    this.selectedCalculator = null;
+  /**
+   * Closes the bumpers calculator while keeping the selected record in memory.
+   */
+  closeCalculator(): void {
+    this.sharedService.patchMarksViewState({
+      selectedCalculator: null,
+    });
+  }
+
+  /**
+   * Scrolls the active calculator panel toward the viewport center when it is outside the comfortable area.
+   */
+  private scrollCalculatorPanelIfNeeded(): void {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        const calculatorPanel = document.querySelector<HTMLElement>(this.calculatorPanelSelector);
+        if (!calculatorPanel) {
+          return;
+        }
+
+        const panelRect = calculatorPanel.getBoundingClientRect();
+        if (this.isElementWithinComfortableViewportZone(panelRect)) {
+          return;
+        }
+
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        calculatorPanel.scrollIntoView({
+          behavior: prefersReducedMotion ? 'auto' : 'smooth',
+          block: 'center',
+          inline: 'nearest',
+        });
+      });
+    });
+  }
+
+  /**
+   * Applies a one-time preselection intent received via router navigation state.
+   */
+  private applyNavigationPreselectionIfNeeded(): void {
+    const navigationState = this.pendingNavigationState;
+    this.pendingNavigationState = null;
+
+    if (!navigationState || navigationState.source !== 'home-best-records') {
+      return;
+    }
+
+    const targetKey = this.getPersonalRecordKey(navigationState.preselectedRecord);
+    const selectedRecord = this.personalRecords.find(record => this.getPersonalRecordKey(record) === targetKey);
+    if (!selectedRecord) {
+      return;
+    }
+
+    this.sharedService.patchMarksViewState({
+      selectedRecordKey: targetKey,
+      selectedPercentage: null,
+      selectedCalculator: null,
+    });
+    this.shouldScrollToSelectedRecord = true;
+  }
+
+  /**
+   * Scrolls the currently selected record card into view when a Home navigation intent requested it.
+   */
+  private scrollSelectedRecordIfNeeded(): void {
+    if (!this.shouldScrollToSelectedRecord) {
+      return;
+    }
+    this.shouldScrollToSelectedRecord = false;
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        const selectedRecordElement = document.querySelector<HTMLElement>(this.selectedRecordSelector);
+        if (!selectedRecordElement) {
+          return;
+        }
+
+        const selectedRecordRect = selectedRecordElement.getBoundingClientRect();
+        if (this.isElementWithinComfortableViewportZone(selectedRecordRect)) {
+          return;
+        }
+
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        selectedRecordElement.scrollIntoView({
+          behavior: prefersReducedMotion ? 'auto' : 'smooth',
+          block: 'center',
+          inline: 'nearest',
+        });
+      });
+    });
+  }
+
+  /**
+   * Determines whether the element center is already located inside the comfortable viewport range.
+   */
+  private isElementWithinComfortableViewportZone(rect: DOMRect): boolean {
+    const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+    const comfortableTop = viewportHeight * 0.25;
+    const comfortableBottom = viewportHeight * 0.65;
+    const elementCenter = rect.top + (rect.height / 2);
+
+    return elementCenter >= comfortableTop && elementCenter <= comfortableBottom;
   }
 
   /**
@@ -258,4 +396,140 @@ export class PersonalRecordsComponent implements OnDestroy, OnInit {
     return this.sharedService.getDesiredWeightForPercentage(pr, percentage, this.selectedBarbell?.unit ?? WeightUnitEnum.KG);
   }
 
+  /**
+   * Returns the selected record key currently stored in the marks view state.
+   */
+  get selectedRecordKey(): string | null {
+    return this.sharedService.getMarksViewStateSnapshot().selectedRecordKey;
+  }
+
+  /**
+   * Returns the selected percentage currently stored in the marks view state.
+   */
+  get selectedPercentage(): number | null {
+    return this.sharedService.getMarksViewStateSnapshot().selectedPercentage;
+  }
+
+  /**
+   * Returns the selected calculator metadata currently stored in the marks view state.
+   */
+  get selectedCalculator() {
+    return this.sharedService.getMarksViewStateSnapshot().selectedCalculator;
+  }
+
+  /**
+   * Returns whether the provided personal record is currently selected.
+   */
+  isSelectedPR(pr: PersonalRecord): boolean {
+    return this.selectedRecordKey === this.getPersonalRecordKey(pr);
+  }
+
+  /**
+   * Restores marks tab selection from the consolidated in-memory view state after records are loaded.
+   */
+  private restoreMarksViewState(): void {
+    const savedState = this.sharedService.getMarksViewStateSnapshot();
+    const selectedRecordKey = savedState.selectedRecordKey;
+
+    if (!selectedRecordKey) {
+      this.selectedPR = null;
+      return;
+    }
+
+    const selectedRecord = this.personalRecords.find(record => this.getPersonalRecordKey(record) === selectedRecordKey);
+    if (!selectedRecord) {
+      this.selectedPR = null;
+      this.sharedService.patchMarksViewState({
+        selectedRecordKey: null,
+        selectedPercentage: null,
+        selectedCalculator: null,
+      });
+      return;
+    }
+
+    this.selectedPR = selectedRecord;
+
+    if (
+      savedState.selectedCalculator &&
+      savedState.selectedPercentage === savedState.selectedCalculator.percentage &&
+      selectedRecord.exerciseType === savedState.selectedCalculator.exercise
+    ) {
+      return;
+    }
+
+    this.sharedService.patchMarksViewState({
+      selectedPercentage: null,
+      selectedCalculator: null,
+    });
+  }
+
+  /**
+   * Reads and validates the transient marks navigation state from the current route transition.
+   */
+  private getMarksNavigationStateFromCurrentNavigation(): MarksNavigationState | null {
+    const state = this.router.getCurrentNavigation()?.extras.state;
+    if (!state || typeof state !== 'object') {
+      return null;
+    }
+
+    const candidate = state as Partial<MarksNavigationState>;
+    if (candidate.source !== 'home-best-records' || !this.isPersonalRecordNavigationSnapshot(candidate.preselectedRecord)) {
+      return null;
+    }
+
+    return {
+      source: 'home-best-records',
+      preselectedRecord: {
+        recordName: candidate.preselectedRecord.recordName,
+        record: candidate.preselectedRecord.record,
+        recordUnit: candidate.preselectedRecord.recordUnit,
+        exerciseType: candidate.preselectedRecord.exerciseType,
+        date: candidate.preselectedRecord.date,
+      },
+    };
+  }
+
+  /**
+   * Verifies that the provided value can be used as a personal record navigation snapshot.
+   */
+  private isPersonalRecordNavigationSnapshot(value: unknown): value is PersonalRecordNavigationSnapshot {
+    if (!value || typeof value !== 'object') {
+      return false;
+    }
+
+    const candidate = value as Partial<PersonalRecordNavigationSnapshot>;
+    const hasRequiredFields = typeof candidate.recordName === 'string'
+      && typeof candidate.record === 'number'
+      && typeof candidate.recordUnit === 'string';
+    if (!hasRequiredFields) {
+      return false;
+    }
+
+    if (candidate.date !== undefined && typeof candidate.date !== 'string' && !(candidate.date instanceof Date)) {
+      return false;
+    }
+
+    if (candidate.exerciseType !== undefined && !Object.values(ExerciseEnum).includes(candidate.exerciseType)) {
+      return false;
+    }
+
+    return true;
+  }
+
+  /**
+   * Builds a stable key to identify personal records across component remounts.
+   */
+  private getPersonalRecordKey(record: PersonalRecord | PersonalRecordNavigationSnapshot): string {
+    const dateValue = record.date instanceof Date
+      ? record.date.toISOString()
+      : (record.date ?? '');
+
+    return [
+      record.recordName,
+      record.record.toString(),
+      record.recordUnit,
+      record.exerciseType ?? '',
+      dateValue,
+    ].join('|');
+  }
 }
