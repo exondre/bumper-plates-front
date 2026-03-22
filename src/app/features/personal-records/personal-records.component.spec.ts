@@ -240,6 +240,10 @@ describe('PersonalRecordsComponent', () => {
   it('scrolls calculator and selected record panels only when they are outside the comfortable viewport zone', () => {
     createComponent();
     setMatchMedia(false);
+    Object.defineProperty(window, 'innerHeight', {
+      configurable: true,
+      value: 1000,
+    });
     spyOn(window, 'requestAnimationFrame').and.callFake((callback: FrameRequestCallback) => {
       callback(0);
       return 1;
@@ -335,6 +339,30 @@ describe('PersonalRecordsComponent', () => {
     };
     (component as any).restoreMarksViewState();
     expect(component.selectedCalculator).toBeNull();
+    expect(component.selectedPercentage).toBeNull();
+  });
+
+  it('opens calculator when percentage matches but there is no active calculator selection', () => {
+    createComponent();
+    const record = component.personalRecords[0];
+    const key = (component as any).getPersonalRecordKey(record);
+    const scrollSpy = spyOn<any>(component, 'scrollCalculatorPanelIfNeeded').and.stub();
+
+    marksViewState = {
+      selectedRecordKey: key,
+      selectedPercentage: 85,
+      selectedCalculator: null,
+      scrollTop: 0,
+    };
+
+    component.openCalculatorForPRAndPercentage(record, 85);
+
+    expect(component.selectedPercentage).toBe(85);
+    expect(component.selectedCalculator).toEqual({
+      exercise: ExerciseEnum.SNATCH,
+      percentage: 85,
+    });
+    expect(scrollSpy).toHaveBeenCalled();
   });
 
   it('delegates desired weight calculation and validates navigation snapshots', () => {

@@ -80,6 +80,40 @@ describe('BumperPlatesCalculatorComponent', () => {
     expect(calculateSpy.calls.count()).toBeGreaterThan(initialCalls);
   });
 
+  it('turns off external mode when the external input mode signal becomes false', () => {
+    fixture.componentRef.setInput('externalInputModeInput', true);
+    fixture.componentRef.setInput('initialWeightInput', 20);
+    fixture.componentRef.setInput('initialWeightUnitInput', 'kg');
+    fixture.componentRef.setInput('desiredWeightInput', 100);
+    fixture.componentRef.setInput('desiredWeightUnitInput', 'kg');
+    fixture.detectChanges();
+
+    expect(component.externalInputMode).toBeTrue();
+
+    fixture.componentRef.setInput('externalInputModeInput', false);
+    fixture.detectChanges();
+
+    expect(component.externalInputMode).toBeFalse();
+  });
+
+  it('recalculates in external mode when only the preferred plates unit changes', () => {
+    const calculateSpy = spyOn(component, 'calculate').and.callThrough();
+
+    fixture.componentRef.setInput('externalInputModeInput', true);
+    fixture.componentRef.setInput('initialWeightInput', 20);
+    fixture.componentRef.setInput('initialWeightUnitInput', 'kg');
+    fixture.componentRef.setInput('desiredWeightInput', 100);
+    fixture.componentRef.setInput('desiredWeightUnitInput', 'kg');
+    fixture.componentRef.setInput('preferredPlatesUnitInput', 'kg');
+    fixture.detectChanges();
+    const callsBeforePreferenceChange = calculateSpy.calls.count();
+
+    fixture.componentRef.setInput('preferredPlatesUnitInput', 'lbs');
+    fixture.detectChanges();
+
+    expect(calculateSpy.calls.count()).toBeGreaterThan(callsBeforePreferenceChange);
+  });
+
   it('closes and swaps the desired weight into the initial weight', () => {
     const closedSpy = spyOn(component.closedSignal, 'emit');
     component.desiredWeight = 90;

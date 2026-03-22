@@ -31,6 +31,7 @@ export class BumperPlatesCalculatorComponent implements OnInit, OnDestroy {
   desiredWeightUnit: string;
   selectedPercentageSuscription?: Subscription;
   private hasAppliedExternalInputs = false;
+  private lastAppliedPreferredPlatesUnit: string | undefined;
 
   constructor(private sharedService: SharedService) {
     this.initialWeight = 20; // Default bar weight
@@ -106,10 +107,11 @@ export class BumperPlatesCalculatorComponent implements OnInit, OnDestroy {
     const desiredWeight = this.desiredWeightInput();
     const desiredWeightUnit = this.desiredWeightUnitInput();
     const preferredPlatesUnit = this.preferredPlatesUnitInput();
-    void preferredPlatesUnit;
 
     if (!externalInputMode) {
+      this.externalInputMode = false;
       this.hasAppliedExternalInputs = false;
+      this.lastAppliedPreferredPlatesUnit = undefined;
       return;
     }
 
@@ -122,7 +124,8 @@ export class BumperPlatesCalculatorComponent implements OnInit, OnDestroy {
       this.initialWeight === initialWeight &&
       this.initialWeightUnit === initialWeightUnit &&
       this.desiredWeight === desiredWeight &&
-      this.desiredWeightUnit === desiredWeightUnit
+      this.desiredWeightUnit === desiredWeightUnit &&
+      this.lastAppliedPreferredPlatesUnit === preferredPlatesUnit
     ) {
       return;
     }
@@ -134,6 +137,7 @@ export class BumperPlatesCalculatorComponent implements OnInit, OnDestroy {
     this.desiredWeightUnit = desiredWeightUnit;
     this.calculate();
     this.hasAppliedExternalInputs = true;
+    this.lastAppliedPreferredPlatesUnit = preferredPlatesUnit;
   });
 
   /**

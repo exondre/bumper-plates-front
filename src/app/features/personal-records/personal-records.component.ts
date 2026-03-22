@@ -176,7 +176,13 @@ export class PersonalRecordsComponent implements OnDestroy, OnInit {
    * Opens the bumpers calculator for the selected record and percentage.
    */
   openCalculatorForPRAndPercentage(pr: PersonalRecord, percentage: number): void {
-    if (this.selectedPercentage === percentage) {
+    const selectedCalculator = this.selectedCalculator;
+    const isSameActiveCalculatorSelection = !!selectedCalculator
+      && this.selectedPercentage === percentage
+      && selectedCalculator.percentage === percentage
+      && selectedCalculator.exercise === pr.exerciseType;
+
+    if (isSameActiveCalculatorSelection) {
       this.sharedService.patchMarksViewState({
         selectedPercentage: null,
         selectedCalculator: null,
@@ -452,6 +458,7 @@ export class PersonalRecordsComponent implements OnDestroy, OnInit {
     }
 
     this.sharedService.patchMarksViewState({
+      selectedPercentage: null,
       selectedCalculator: null,
     });
   }

@@ -22,7 +22,7 @@ export class AppComponent implements AfterViewInit, OnDestroy {
   private darkModeListener: ((e: MediaQueryListEvent) => void) | null = null;
   private darkModeListenerActive = false;
   private subscriptions = new Subscription();
-  private previousUrl = this.router.url;
+  private previousUrl = '';
 
   constructor(
     private router: Router,
@@ -30,6 +30,7 @@ export class AppComponent implements AfterViewInit, OnDestroy {
     private pwaUpdateService: PwaUpdateService,
   ) {
     this.hideHeader = this.router.url === '/home';
+    this.previousUrl = this.router.url;
     this.subscriptions.add(
       this.router.events
         .pipe(filter((e): e is NavigationStart | NavigationEnd => e instanceof NavigationStart || e instanceof NavigationEnd))

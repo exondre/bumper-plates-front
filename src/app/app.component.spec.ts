@@ -89,6 +89,18 @@ describe('AppComponent', () => {
     expect(component.hideHeader).toBeTrue();
   });
 
+  it('initializes previous url from the injected router before navigation events', () => {
+    createComponent('/marcas');
+    const appContent = { scrollTop: 0 } as HTMLElement;
+    component.appContentRef = new ElementRef(appContent);
+    appContent.scrollTop = 64;
+
+    expect((component as any).previousUrl).toBe('/marcas');
+
+    routerEvents$.next(new NavigationStart(1, '/home'));
+    expect(sharedService.patchMarksViewState).toHaveBeenCalledWith({ scrollTop: 64 });
+  });
+
   it('applies color schemes and reacts to system dark mode changes', () => {
     createComponent('/home');
 
