@@ -6,7 +6,7 @@
     </a>
   </header>
 }
-<main class="app-content" [ngClass]="{ 'has-header': !hideHeader, 'no-header': hideHeader }">
+<main #appContent class="app-content" [ngClass]="{ 'has-header': !hideHeader, 'no-header': hideHeader }">
   <router-outlet></router-outlet>
 </main>
 <nav class="nav custom-nav nav-pills nav-fill flex-nowrap">

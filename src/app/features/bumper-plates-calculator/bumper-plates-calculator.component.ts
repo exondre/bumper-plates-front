@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, input, OnDestroy, OnInit, output } from '@angular/core';
+import { Component, effect, input, OnDestroy, OnInit, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { SharedService } from '../../service/shared.service';
@@ -30,6 +30,7 @@ export class BumperPlatesCalculatorComponent implements OnInit, OnDestroy {
   initialWeightUnit: string;
   desiredWeightUnit: string;
   selectedPercentageSuscription?: Subscription;
+  private hasAppliedExternalInputs = false;
 
   constructor(private sharedService: SharedService) {
     this.initialWeight = 20; // Default bar weight
@@ -94,6 +95,46 @@ export class BumperPlatesCalculatorComponent implements OnInit, OnDestroy {
     this.initialWeightUnit = this.desiredWeightUnit;
     this.desiredWeight = 0;
   }
+
+  /**
+   * Reacts to external input updates and recalculates without remounting the component.
+   */
+  private syncExternalInputsEffect = effect(() => {
+    const externalInputMode = this.externalInputModeInput();
+    const initialWeight = this.initialWeightInput();
+    const initialWeightUnit = this.initialWeightUnitInput();
+    const desiredWeight = this.desiredWeightInput();
+    const desiredWeightUnit = this.desiredWeightUnitInput();
+    const preferredPlatesUnit = this.preferredPlatesUnitInput();
+    void preferredPlatesUnit;
+
+    if (!externalInputMode) {
+      this.hasAppliedExternalInputs = false;
+      return;
+    }
+
+    if (initialWeight == null || !initialWeightUnit || desiredWeight == null || !desiredWeightUnit) {
+      return;
+    }
+
+    if (
+      this.hasAppliedExternalInputs &&
+      this.initialWeight === initialWeight &&
+      this.initialWeightUnit === initialWeightUnit &&
+      this.desiredWeight === desiredWeight &&
+      this.desiredWeightUnit === desiredWeightUnit
+    ) {
+      return;
+    }
+
+    this.externalInputMode = true;
+    this.initialWeight = initialWeight;
+    this.initialWeightUnit = initialWeightUnit;
+    this.desiredWeight = desiredWeight;
+    this.desiredWeightUnit = desiredWeightUnit;
+    this.calculate();
+    this.hasAppliedExternalInputs = true;
+  });
 
   /**
    * Calculate the required bumpers to achieve the desired weight on a barbell.

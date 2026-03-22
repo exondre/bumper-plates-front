@@ -54,7 +54,7 @@
                   <i class="bi bi-trash"></i>
                 </button>
               </div>
-              @if (selectedPR === p) {
+              @if (isSelectedPR(p)) {
                 <div class="d-flex flex-wrap gap-2 w-100 mt-3">
                   @for (pc of percentageList; track pc.value) {
                     <button type="button" class="btn btn-outline-secondary btn-sm" style="flex: 0 0 calc(25% - 0.375rem);"
@@ -68,7 +68,7 @@
               @if (selectedCalculator?.exercise === p.exerciseType && selectedCalculator?.percentage === selectedPercentage) {
                 @let personalRecord =  p;
                 @let percentage = selectedPercentage; 
-                <div class="w-100">
+                <div class="w-100" data-marks-calculator-panel="true">
                   <app-bumper-plates-calculator (closedSignal)="closeCalculator()" [externalInputModeInput]="true"
                     [initialWeightInput]="selectedBarbell?.value" [initialWeightUnitInput]="selectedBarbell?.unit"
                     [desiredWeightInput]="getDesiredWeightForPercentage(personalRecord, percentage)"

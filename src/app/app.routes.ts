@@ -12,7 +12,7 @@ export const routes: Routes = [
   },
   {
     path: 'marcas',
-    loadComponent: () => import('./features/marks/marks.component').then(m => m.MarksComponent),
+    loadComponent: () => import('./features/personal-records/personal-records.component').then(m => m.PersonalRecordsComponent),
   },
   {
     path: 'calculadora',
