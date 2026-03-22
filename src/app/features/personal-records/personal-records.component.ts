@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { BumperPlatesCalculatorComponent } from '../bumper-plates-calculator/bumper-plates-calculator.component';
 import { LocalStorageService } from '../../service/local-storage.service';
@@ -7,6 +8,7 @@ import { SharedService } from '../../service/shared.service';
 import { LSKeysEnum } from '../../shared/enums/LSKeysEnum';
 import { ExerciseEnum } from '../../shared/enums/ExerciseEnum';
 import { WeightUnitEnum } from '../../shared/enums/weight-unit.enum';
+import { MarksNavigationState, PersonalRecordNavigationSnapshot } from '../../shared/interfaces/marks-navigation-state.interface';
 import { NewPrComponent } from './new-pr/new-pr.component';
 import { PersonalRecord } from './personal-record.interface';
 
@@ -18,6 +20,7 @@ import { PersonalRecord } from './personal-record.interface';
 })
 export class PersonalRecordsComponent implements OnDestroy, OnInit {
   private sharedService = inject(SharedService);
+  private router = inject(Router);
 
   personalRecords: PersonalRecord[] = [];
   showNewPR: boolean = false;
@@ -50,10 +53,15 @@ export class PersonalRecordsComponent implements OnDestroy, OnInit {
 
   private preferencesSub: Subscription = new Subscription();
   private readonly calculatorPanelSelector = '[data-marks-calculator-panel="true"]';
+  private readonly selectedRecordSelector = '[data-selected-record="true"]';
+  private pendingNavigationState: MarksNavigationState | null = null;
+  private shouldScrollToSelectedRecord = false;
 
   constructor(
     private lsService: LocalStorageService,
   ) {
+    this.pendingNavigationState = this.getMarksNavigationStateFromCurrentNavigation();
+
     this.showNewPRSubscription = this.sharedService.getShowNewPR().subscribe(s => {
       this.showNewPR = s;
       if (!s) {
@@ -118,7 +126,9 @@ export class PersonalRecordsComponent implements OnDestroy, OnInit {
     const parsedRecords: PersonalRecord[] = storedValue ? JSON.parse(storedValue) : [];
 
     this.personalRecords = this.sortPersonalRecords(parsedRecords);
+    this.applyNavigationPreselectionIfNeeded();
     this.restoreMarksViewState();
+    this.scrollSelectedRecordIfNeeded();
   }
 
   /**
@@ -208,7 +218,7 @@ export class PersonalRecordsComponent implements OnDestroy, OnInit {
         }
 
         const panelRect = calculatorPanel.getBoundingClientRect();
-        if (this.isPanelWithinComfortableViewportZone(panelRect)) {
+        if (this.isElementWithinComfortableViewportZone(panelRect)) {
           return;
         }
 
@@ -223,15 +233,71 @@ export class PersonalRecordsComponent implements OnDestroy, OnInit {
   }
 
   /**
-   * Determines whether the panel center is already located inside the comfortable viewport range.
+   * Applies a one-time preselection intent received via router navigation state.
    */
-  private isPanelWithinComfortableViewportZone(panelRect: DOMRect): boolean {
+  private applyNavigationPreselectionIfNeeded(): void {
+    const navigationState = this.pendingNavigationState;
+    this.pendingNavigationState = null;
+
+    if (!navigationState || navigationState.source !== 'home-best-records') {
+      return;
+    }
+
+    const targetKey = this.getPersonalRecordKey(navigationState.preselectedRecord);
+    const selectedRecord = this.personalRecords.find(record => this.getPersonalRecordKey(record) === targetKey);
+    if (!selectedRecord) {
+      return;
+    }
+
+    this.sharedService.patchMarksViewState({
+      selectedRecordKey: targetKey,
+      selectedPercentage: null,
+      selectedCalculator: null,
+    });
+    this.shouldScrollToSelectedRecord = true;
+  }
+
+  /**
+   * Scrolls the currently selected record card into view when a Home navigation intent requested it.
+   */
+  private scrollSelectedRecordIfNeeded(): void {
+    if (!this.shouldScrollToSelectedRecord) {
+      return;
+    }
+    this.shouldScrollToSelectedRecord = false;
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        const selectedRecordElement = document.querySelector<HTMLElement>(this.selectedRecordSelector);
+        if (!selectedRecordElement) {
+          return;
+        }
+
+        const selectedRecordRect = selectedRecordElement.getBoundingClientRect();
+        if (this.isElementWithinComfortableViewportZone(selectedRecordRect)) {
+          return;
+        }
+
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        selectedRecordElement.scrollIntoView({
+          behavior: prefersReducedMotion ? 'auto' : 'smooth',
+          block: 'center',
+          inline: 'nearest',
+        });
+      });
+    });
+  }
+
+  /**
+   * Determines whether the element center is already located inside the comfortable viewport range.
+   */
+  private isElementWithinComfortableViewportZone(rect: DOMRect): boolean {
     const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
     const comfortableTop = viewportHeight * 0.25;
     const comfortableBottom = viewportHeight * 0.65;
-    const panelCenter = panelRect.top + (panelRect.height / 2);
+    const elementCenter = rect.top + (rect.height / 2);
 
-    return panelCenter >= comfortableTop && panelCenter <= comfortableBottom;
+    return elementCenter >= comfortableTop && elementCenter <= comfortableBottom;
   }
 
   /**
@@ -391,9 +457,62 @@ export class PersonalRecordsComponent implements OnDestroy, OnInit {
   }
 
   /**
+   * Reads and validates the transient marks navigation state from the current route transition.
+   */
+  private getMarksNavigationStateFromCurrentNavigation(): MarksNavigationState | null {
+    const state = this.router.getCurrentNavigation()?.extras.state;
+    if (!state || typeof state !== 'object') {
+      return null;
+    }
+
+    const candidate = state as Partial<MarksNavigationState>;
+    if (candidate.source !== 'home-best-records' || !this.isPersonalRecordNavigationSnapshot(candidate.preselectedRecord)) {
+      return null;
+    }
+
+    return {
+      source: 'home-best-records',
+      preselectedRecord: {
+        recordName: candidate.preselectedRecord.recordName,
+        record: candidate.preselectedRecord.record,
+        recordUnit: candidate.preselectedRecord.recordUnit,
+        exerciseType: candidate.preselectedRecord.exerciseType,
+        date: candidate.preselectedRecord.date,
+      },
+    };
+  }
+
+  /**
+   * Verifies that the provided value can be used as a personal record navigation snapshot.
+   */
+  private isPersonalRecordNavigationSnapshot(value: unknown): value is PersonalRecordNavigationSnapshot {
+    if (!value || typeof value !== 'object') {
+      return false;
+    }
+
+    const candidate = value as Partial<PersonalRecordNavigationSnapshot>;
+    const hasRequiredFields = typeof candidate.recordName === 'string'
+      && typeof candidate.record === 'number'
+      && typeof candidate.recordUnit === 'string';
+    if (!hasRequiredFields) {
+      return false;
+    }
+
+    if (candidate.date !== undefined && typeof candidate.date !== 'string' && !(candidate.date instanceof Date)) {
+      return false;
+    }
+
+    if (candidate.exerciseType !== undefined && !Object.values(ExerciseEnum).includes(candidate.exerciseType)) {
+      return false;
+    }
+
+    return true;
+  }
+
+  /**
    * Builds a stable key to identify personal records across component remounts.
    */
-  private getPersonalRecordKey(record: PersonalRecord): string {
+  private getPersonalRecordKey(record: PersonalRecord | PersonalRecordNavigationSnapshot): string {
     const dateValue = record.date instanceof Date
       ? record.date.toISOString()
       : (record.date ?? '');

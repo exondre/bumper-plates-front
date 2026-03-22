@@ -10,14 +10,19 @@
       <h2>Mis mejores marcas</h2>
       <div class="records-grid">
         @for (pr of latestRecords; track pr.recordName + pr.record) {
-          <div class="record-card">
+          <button
+            type="button"
+            class="record-card record-card-button"
+            (click)="openRecordInMarks(pr)"
+            [attr.aria-label]="'Abrir ' + pr.recordName + ' en la pestaña de Marcas'"
+          >
             <span class="record-exercise">{{ (pr.exerciseType ?? '') | exerciseLabel }}</span>
             <span class="record-weight">{{ pr.record }} {{ pr.recordUnit }}</span>
             <span class="record-name">{{ pr.recordName }}</span>
             @if (pr.date) {
               <span class="record-date">{{ pr.date | date:'dd/MM/yyyy' }}</span>
             }
-          </div>
+          </button>
         }
       </div>
     </section>

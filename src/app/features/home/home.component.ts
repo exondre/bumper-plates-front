@@ -1,12 +1,13 @@
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { LocalStorageService } from '../../service/local-storage.service';
 import { SharedService } from '../../service/shared.service';
 import { LSKeysEnum } from '../../shared/enums/LSKeysEnum';
 import { ExerciseEnum } from '../../shared/enums/ExerciseEnum';
+import { MarksNavigationState } from '../../shared/interfaces/marks-navigation-state.interface';
 import { ExerciseLabelPipe } from '../../shared/pipes/exercise-label.pipe';
 import { PersonalRecord } from '../personal-records/personal-record.interface';
 import packageJson from '../../../../package.json';
@@ -27,6 +28,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   constructor(
     private lsService: LocalStorageService,
     private sharedService: SharedService,
+    private router: Router,
   ) {}
 
   ngOnInit(): void {
@@ -39,6 +41,26 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.reloadSub.unsubscribe();
+  }
+
+  /**
+   * Navigates to the marcas tab with a transient preselection intent.
+   */
+  openRecordInMarks(record: PersonalRecord): void {
+    const navigationState: MarksNavigationState = {
+      source: 'home-best-records',
+      preselectedRecord: {
+        recordName: record.recordName,
+        record: record.record,
+        recordUnit: record.recordUnit,
+        exerciseType: record.exerciseType,
+        date: record.date,
+      },
+    };
+
+    void this.router.navigate(['/marcas'], {
+      state: navigationState,
+    });
   }
 
   private loadLatestRecords(): void {

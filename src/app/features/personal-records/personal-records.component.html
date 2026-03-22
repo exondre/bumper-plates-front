@@ -29,7 +29,8 @@
       @if (personalRecords.length > 0) {
         @for (p of personalRecords; track p.recordName + '-'+ p.record + '-' + p.recordUnit + '-' + p.date) {
           @if (showAllRecords || p.isLatest) {
-            <li class="list-group-item d-flex flex-wrap align-items-center justify-content-between" 
+            <li class="list-group-item d-flex flex-wrap align-items-center justify-content-between"
+              [attr.data-selected-record]="isSelectedPR(p) ? 'true' : null"
               (click)="sendToPercentageCalculator($event, p)">
               <div class="d-flex flex-column gap-2">
                 <span class="me-2 flex-fill">
