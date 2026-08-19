@@ -299,6 +299,7 @@ describe('TrainingWeekSelectorComponent', () => {
     expect(component.getDesiredWeightForSet({ ...personalRecords[4], record: 100, recordUnit: WeightUnitEnum.LBS }, trainingSet, WeightUnitEnum.KG)).toBeCloseTo(36.29, 2);
     expect(component.getDesiredWeightForSet(personalRecords[1], trainingSet, WeightUnitEnum.LBS)).toBeCloseTo(141.1, 1);
     expect(component.getDesiredWeightForSet(personalRecords[1], { id: 'set-2', reps: '5' }, WeightUnitEnum.KG)).toBe(80);
+    expect(component.getDesiredWeightForSet(undefined, trainingSet, WeightUnitEnum.KG)).toBe(20);
   }));
 
   it('syncs selected week and session from the shared service and unsubscribes on destroy', () => {

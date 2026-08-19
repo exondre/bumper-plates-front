@@ -17,6 +17,7 @@ describe('NewPrComponent', () => {
     record: 95,
     recordUnit: 'kg',
     exerciseType: ExerciseEnum.SNATCH,
+    date: '2024-06-15T00:00:00.000Z',
   };
 
   const createComponent = async (record: PersonalRecord | null = null) => {
@@ -62,14 +63,37 @@ describe('NewPrComponent', () => {
     expect(component.recordExcerciseType).toBe(ExerciseEnum.SNATCH);
   });
 
+  it('renders every catalog exercise in localized groups', async () => {
+    await createComponent();
+
+    const groupElements = Array.from(
+      fixture.nativeElement.querySelectorAll('optgroup') as NodeListOf<HTMLOptGroupElement>,
+    );
+    const optionElements = Array.from(
+      fixture.nativeElement.querySelectorAll('option') as NodeListOf<HTMLOptionElement>,
+    );
+
+    expect(groupElements.map(group => group.label)).toEqual([
+      'Variantes de arranque',
+      'Variantes de clean y envión',
+      'Empujes',
+      'Sentadillas',
+      'Fuerza general con barra',
+      'Otros',
+    ]);
+    expect(optionElements.length).toBe(20);
+    expect(optionElements.at(-1)?.value).toBe(ExerciseEnum.NONE);
+    expect(optionElements.at(-1)?.textContent?.trim()).toBe('Sin tipo');
+  });
+
   it('saves a new record, persists it and closes the form', async () => {
     localStorageService.getItem.and.returnValue('[]');
     await createComponent();
 
-    component.weightRecordName = 'Envión';
+    component.weightRecordName = 'Hang power clean';
     component.weightRecord = 120;
     component.weightRecordUnit = 'lbs';
-    component.recordExcerciseType = ExerciseEnum.CLEAN_AND_JERK;
+    component.recordExcerciseType = ExerciseEnum.HANG_POWER_CLEAN;
 
     component.saveNewRecord();
 
@@ -79,10 +103,10 @@ describe('NewPrComponent', () => {
       jasmine.any(String),
     );
     expect(savedPayload.length).toBe(1);
-    expect(savedPayload[0].recordName).toBe('Envión');
+    expect(savedPayload[0].recordName).toBe('Hang power clean');
     expect(savedPayload[0].record).toBe(120);
     expect(savedPayload[0].recordUnit).toBe('lbs');
-    expect(savedPayload[0].exerciseType).toBe(ExerciseEnum.CLEAN_AND_JERK);
+    expect(savedPayload[0].exerciseType).toBe(ExerciseEnum.HANG_POWER_CLEAN);
     expect(sharedService.sendReloadPR).toHaveBeenCalled();
     expect(sharedService.sendShowNewPR).toHaveBeenCalledWith(false);
     expect(component.weightRecordName).toBe('');
@@ -114,6 +138,74 @@ describe('NewPrComponent', () => {
     expect(savedPayload[0].recordName).toBe('Arranque power');
     expect(savedPayload[0].record).toBe(100);
     expect(savedPayload[1].recordName).toBe('Sentadilla');
+  });
+
+  it('keeps a legacy NONE record unchanged until it is explicitly reclassified', async () => {
+    const legacyRecord: PersonalRecord = {
+      recordName: 'Thruster',
+      record: 82.5,
+      recordUnit: 'kg',
+      exerciseType: ExerciseEnum.NONE,
+      date: '2024-02-20T00:00:00.000Z',
+    };
+    localStorageService.getItem.and.returnValue(JSON.stringify([legacyRecord]));
+    await createComponent(legacyRecord);
+
+    expect(component.recordExcerciseType).toBe(ExerciseEnum.NONE);
+
+    component.recordExcerciseType = ExerciseEnum.THRUSTER;
+    component.saveNewRecord();
+
+    const savedPayload = JSON.parse(localStorageService.setItem.calls.mostRecent().args[1]);
+    expect(savedPayload).toEqual([{
+      ...legacyRecord,
+      exerciseType: ExerciseEnum.THRUSTER,
+    }]);
+  });
+
+  it('saves a legacy NONE record without adding a date or inferring a type', async () => {
+    const legacyRecord: PersonalRecord = {
+      recordName: 'Peso Muerto',
+      record: 145,
+      recordUnit: 'kg',
+      exerciseType: ExerciseEnum.NONE,
+    };
+    localStorageService.getItem.and.returnValue(JSON.stringify([legacyRecord]));
+    await createComponent(legacyRecord);
+
+    component.saveNewRecord();
+
+    const savedPayload = JSON.parse(localStorageService.setItem.calls.mostRecent().args[1]);
+    expect(savedPayload).toEqual([legacyRecord]);
+  });
+
+  it('updates the exact dated record when duplicate names, weights and units exist', async () => {
+    const duplicateRecords: PersonalRecord[] = [
+      {
+        recordName: 'Thruster',
+        record: 80,
+        recordUnit: 'kg',
+        exerciseType: ExerciseEnum.NONE,
+        date: '2024-01-01T00:00:00.000Z',
+      },
+      {
+        recordName: 'Thruster',
+        record: 80,
+        recordUnit: 'kg',
+        exerciseType: ExerciseEnum.NONE,
+        date: '2024-02-01T00:00:00.000Z',
+      },
+    ];
+    localStorageService.getItem.and.returnValue(JSON.stringify(duplicateRecords));
+    await createComponent(duplicateRecords[1]);
+
+    component.recordExcerciseType = ExerciseEnum.THRUSTER;
+    component.saveNewRecord();
+
+    const savedPayload = JSON.parse(localStorageService.setItem.calls.mostRecent().args[1]);
+    expect(savedPayload[0].exerciseType).toBe(ExerciseEnum.NONE);
+    expect(savedPayload[1].exerciseType).toBe(ExerciseEnum.THRUSTER);
+    expect(savedPayload[1].date).toBe('2024-02-01T00:00:00.000Z');
   });
 
   it('cancels the form and restores defaults', async () => {

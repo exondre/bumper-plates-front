@@ -5,6 +5,7 @@ import { Router, RouterLink } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { LocalStorageService } from '../../service/local-storage.service';
 import { SharedService } from '../../service/shared.service';
+import { getExerciseRecordOrder } from '../../shared/constants/exercise-catalog';
 import { LSKeysEnum } from '../../shared/enums/LSKeysEnum';
 import { ExerciseEnum } from '../../shared/enums/ExerciseEnum';
 import { MarksNavigationState } from '../../shared/interfaces/marks-navigation-state.interface';
@@ -78,7 +79,9 @@ export class HomeComponent implements OnInit, OnDestroy {
       }
     }
 
-    this.latestRecords = Array.from(latestByExercise.values());
+    this.latestRecords = Array.from(latestByExercise.values())
+      .sort((a, b) => getExerciseRecordOrder(a.exerciseType ?? ExerciseEnum.NONE)
+        - getExerciseRecordOrder(b.exerciseType ?? ExerciseEnum.NONE));
   }
 
   private toTimestamp(record: PersonalRecord): number {

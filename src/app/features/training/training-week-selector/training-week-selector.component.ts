@@ -233,15 +233,22 @@ Si eliges no recuperar, podrás seguir usando la app, pero algunas funcionalidad
     this.selectedCalculator = null;
   }
 
-  getDesiredWeightForSet(pr: PersonalRecord, set: TrainingSet, barbellWeightUnit: WeightUnitEnum | string): number {
-    const desiredWeight = pr && set?.weightPercent ? (pr?.record! * set?.weightPercent! / 100) : pr?.record ?? 20;
+  /** Calculates a set load and falls back to the empty-bar weight when no matching record exists. */
+  getDesiredWeightForSet(
+    pr: PersonalRecord | undefined,
+    set: TrainingSet,
+    barbellWeightUnit: WeightUnitEnum | string,
+  ): number {
+    const desiredWeight = pr && set.weightPercent
+      ? pr.record * set.weightPercent / 100
+      : pr?.record ?? 20;
 
-    if (barbellWeightUnit === WeightUnitEnum.KG.toString() && pr.recordUnit === WeightUnitEnum.LBS) {
+    if (pr && barbellWeightUnit === WeightUnitEnum.KG.toString() && pr.recordUnit === WeightUnitEnum.LBS) {
       // Convertir de lbs a kg
       return +(desiredWeight * this.sharedService.poundToKiloFactor).toFixed(2);
     }
 
-    if (barbellWeightUnit === WeightUnitEnum.LBS.toString() && pr.recordUnit === WeightUnitEnum.KG) {
+    if (pr && barbellWeightUnit === WeightUnitEnum.LBS.toString() && pr.recordUnit === WeightUnitEnum.KG) {
       // Convertir de kg a lbs
       return +(desiredWeight * this.sharedService.kiloToPoundFactor).toFixed(2);
     }

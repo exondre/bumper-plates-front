@@ -1,18 +1,18 @@
 
 import { Component, Input, OnInit } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { EXERCISE_GROUPS, isExerciseType } from '../../../shared/constants/exercise-catalog';
 import { ExerciseEnum } from '../../../shared/enums/ExerciseEnum';
 import { LSKeysEnum } from '../../../shared/enums/LSKeysEnum';
 import { LocalStorageService } from '../../../service/local-storage.service';
 import { SharedService } from '../../../service/shared.service';
-import { ExerciseLabelPipe } from '../../../shared/pipes/exercise-label.pipe';
 import { PersonalRecord } from '../personal-record.interface';
-import { FormsModule } from '@angular/forms';
 
 @Component({
-    selector: 'app-new-pr',
-    imports: [ExerciseLabelPipe, FormsModule],
-    templateUrl: './new-pr.component.html',
-    styleUrl: './new-pr.component.scss'
+  selector: 'app-new-pr',
+  imports: [FormsModule],
+  templateUrl: './new-pr.component.html',
+  styleUrl: './new-pr.component.scss',
 })
 export class NewPrComponent implements OnInit {
   @Input() editRecord: PersonalRecord | null = null;
@@ -22,8 +22,7 @@ export class NewPrComponent implements OnInit {
   weightRecordUnit: string = 'kg';
   recordExcerciseType: ExerciseEnum = ExerciseEnum.NONE;
 
-  ExerciseEnum = ExerciseEnum;
-  exerciseTypes: string[] = Object.values(ExerciseEnum);
+  readonly exerciseGroups = EXERCISE_GROUPS;
 
   get isEditMode(): boolean {
     return this.editRecord !== null;
@@ -39,7 +38,9 @@ export class NewPrComponent implements OnInit {
       this.weightRecordName = this.editRecord.recordName;
       this.weightRecord = this.editRecord.record;
       this.weightRecordUnit = this.editRecord.recordUnit;
-      this.recordExcerciseType = this.editRecord.exerciseType ?? ExerciseEnum.NONE;
+      this.recordExcerciseType = isExerciseType(this.editRecord.exerciseType)
+        ? this.editRecord.exerciseType
+        : ExerciseEnum.NONE;
     }
   }
 
@@ -53,16 +54,29 @@ export class NewPrComponent implements OnInit {
       recordName: this.weightRecordName,
       record: this.weightRecord,
       recordUnit: this.weightRecordUnit,
-      exerciseType: this.recordExcerciseType,
-      date: new Date(),
+      exerciseType: isExerciseType(this.recordExcerciseType)
+        ? this.recordExcerciseType
+        : ExerciseEnum.NONE,
+      date: this.isEditMode ? this.editRecord?.date : new Date(),
     };
 
     if (this.isEditMode) {
+      const editedRecord = this.editRecord!;
+      const editedRecordDate = editedRecord.date instanceof Date
+        ? editedRecord.date.toISOString()
+        : editedRecord.date;
       const index = personalRecords.findIndex(
-        (p) =>
-          p.recordName === this.editRecord!.recordName &&
-          p.record === this.editRecord!.record &&
-          p.recordUnit === this.editRecord!.recordUnit
+        (personalRecord) => {
+          const personalRecordDate = personalRecord.date instanceof Date
+            ? personalRecord.date.toISOString()
+            : personalRecord.date;
+
+          return personalRecord.recordName === editedRecord.recordName
+            && personalRecord.record === editedRecord.record
+            && personalRecord.recordUnit === editedRecord.recordUnit
+            && personalRecord.exerciseType === editedRecord.exerciseType
+            && personalRecordDate === editedRecordDate;
+        },
       );
       if (index !== -1) {
         personalRecords[index] = newPR;

@@ -16,7 +16,7 @@
             (click)="openRecordInMarks(pr)"
             [attr.aria-label]="'Abrir ' + pr.recordName + ' en la pestaña de Marcas'"
           >
-            <span class="record-exercise">{{ (pr.exerciseType ?? '') | exerciseLabel }}</span>
+            <span class="record-exercise">{{ pr.exerciseType | exerciseLabel }}</span>
             <span class="record-weight">{{ pr.record }} {{ pr.recordUnit }}</span>
             <span class="record-name">{{ pr.recordName }}</span>
             @if (pr.date) {

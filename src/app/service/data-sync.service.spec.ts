@@ -85,6 +85,90 @@ describe('DataSyncService', () => {
     expect(persistedPayload[0].date).toBe('2024-01-15T00:00:00.000Z');
   });
 
+  it('round trips new and legacy NONE exercise types without schema changes or warnings', () => {
+    const result = service.import(JSON.stringify({
+      schemaVersion: '1.0.0',
+      exportedAt: '2024-03-01T12:00:00.000Z',
+      resources: {
+        [DataSyncResource.PersonalRecords]: {
+          version: 1,
+          data: [
+            {
+              recordName: 'Thruster',
+              record: 80,
+              recordUnit: 'kg',
+              exerciseType: ExerciseEnum.THRUSTER,
+              date: '2024-01-10T00:00:00.000Z',
+            },
+            {
+              recordName: 'Peso muerto sin tipo',
+              record: 150,
+              recordUnit: 'kg',
+              exerciseType: ExerciseEnum.NONE,
+              date: '2024-01-11T00:00:00.000Z',
+            },
+          ],
+        },
+      },
+    }));
+
+    const persistedPayload = localStorageService.setItem.calls.mostRecent().args[1];
+    localStorageService.getItem.and.returnValue(persistedPayload);
+    const exportedPayload = JSON.parse(service.export()) as DataSyncPayload;
+
+    expect(result.warnings).toEqual([]);
+    expect(exportedPayload.schemaVersion).toBe('1.0.0');
+    expect(exportedPayload.resources[DataSyncResource.PersonalRecords]?.version).toBe(1);
+    expect(exportedPayload.resources[DataSyncResource.PersonalRecords]?.data).toEqual([
+      jasmine.objectContaining({ exerciseType: ExerciseEnum.THRUSTER }),
+      jasmine.objectContaining({ exerciseType: ExerciseEnum.NONE }),
+    ]);
+  });
+
+  it('normalizes unsupported imported types once without suggesting a replacement', () => {
+    const result = service.import(JSON.stringify({
+      schemaVersion: '1.0.0',
+      exportedAt: '2024-03-01T12:00:00.000Z',
+      resources: {
+        [DataSyncResource.PersonalRecords]: {
+          version: 1,
+          data: [
+            {
+              recordName: 'Movimiento externo',
+              record: 60,
+              recordUnit: 'kg',
+              exerciseType: 'EXTERNAL_MOVEMENT',
+            },
+            {
+              recordName: 'Otro movimiento externo',
+              record: 65,
+              recordUnit: 'kg',
+              exerciseType: 'ANOTHER_EXTERNAL_MOVEMENT',
+            },
+            {
+              recordName: 'Tipo externo no textual',
+              record: 70,
+              recordUnit: 'kg',
+              exerciseType: { source: 'external' },
+            },
+          ],
+        },
+      },
+    }));
+
+    const persistedPayload = JSON.parse(localStorageService.setItem.calls.mostRecent().args[1]);
+    expect(result.warnings).toEqual([
+      'Algunos registros tenían un tipo de ejercicio no compatible y se importaron como "Sin tipo".',
+    ]);
+    expect(result.warnings[0]).not.toContain('reclasifica');
+    expect(result.warnings[0]).not.toContain('recomend');
+    expect(persistedPayload.map((record: { exerciseType: ExerciseEnum }) => record.exerciseType)).toEqual([
+      ExerciseEnum.NONE,
+      ExerciseEnum.NONE,
+      ExerciseEnum.NONE,
+    ]);
+  });
+
   it('merges personal records by name when merge mode is enabled', () => {
     localStorageService.getItem.and.returnValue(JSON.stringify([
       {

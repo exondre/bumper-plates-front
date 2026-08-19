@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 import { PersonalRecord } from '../features/personal-records/personal-record.interface';
+import { isExerciseType } from '../shared/constants/exercise-catalog';
+import { ExerciseEnum } from '../shared/enums/ExerciseEnum';
 import { LSKeysEnum } from '../shared/enums/LSKeysEnum';
 import { LocalStorageService } from './local-storage.service';
 
@@ -50,6 +52,8 @@ export interface DataSyncImportResult {
 export class DataSyncService {
   private static readonly PERSONAL_RECORDS_VERSION = 1;
   private static readonly SCHEMA_VERSION = '1.0.0';
+  private static readonly UNSUPPORTED_EXERCISE_TYPE_WARNING =
+    'Algunos registros tenían un tipo de ejercicio no compatible y se importaron como "Sin tipo".';
 
   constructor(private readonly localStorageService: LocalStorageService) {}
 
@@ -90,7 +94,7 @@ export class DataSyncService {
       }
 
       try {
-        this.persistResource(resource, resourcePayload, options);
+        warnings.push(...this.persistResource(resource, resourcePayload, options));
         importedResources.push(resource);
       } catch (error) {
         warnings.push((error as Error).message);
@@ -151,11 +155,10 @@ export class DataSyncService {
     resource: DataSyncResource,
     payload: DataSyncResourcePayload,
     options?: DataSyncImportOptions,
-  ): void {
+  ): string[] {
     switch (resource) {
       case DataSyncResource.PersonalRecords:
-        this.persistPersonalRecords(payload as DataSyncResourcePayload<unknown>, options);
-        break;
+        return this.persistPersonalRecords(payload as DataSyncResourcePayload<unknown>, options);
       default:
         throw new Error(`El recurso ${resource} no está soportado en esta versión.`);
     }
@@ -164,7 +167,7 @@ export class DataSyncService {
   private persistPersonalRecords(
     payload: DataSyncResourcePayload<unknown>,
     options?: DataSyncImportOptions,
-  ): void {
+  ): string[] {
     if (payload.version !== DataSyncService.PERSONAL_RECORDS_VERSION) {
       throw new Error('La versión de las marcas personales no es compatible con esta aplicación.');
     }
@@ -173,7 +176,8 @@ export class DataSyncService {
       throw new Error('Los datos de marcas personales deben ser un arreglo.');
     }
 
-    const sanitizedRecords = this.sanitizePersonalRecords(payload.data);
+    const warnings: string[] = [];
+    const sanitizedRecords = this.sanitizePersonalRecords(payload.data, warnings);
     if (sanitizedRecords.length === 0) {
       throw new Error('El archivo no contiene marcas personales válidas.');
     }
@@ -183,15 +187,17 @@ export class DataSyncService {
     } else {
       this.localStorageService.setItem(LSKeysEnum.PERSONAL_RECORDS, JSON.stringify(sanitizedRecords));
     }
+
+    return warnings;
   }
 
-  private sanitizePersonalRecords(records: unknown[]): PersonalRecord[] {
+  private sanitizePersonalRecords(records: unknown[], warnings: string[] = []): PersonalRecord[] {
     return records.reduce<PersonalRecord[]>((acc, record) => {
       if (!record || typeof record !== 'object') {
         return acc;
       }
 
-      const parsedRecord = this.coercePersonalRecord(record as Record<string, unknown>);
+      const parsedRecord = this.coercePersonalRecord(record as Record<string, unknown>, warnings);
       if (!parsedRecord) {
         return acc;
       }
@@ -200,7 +206,10 @@ export class DataSyncService {
     }, []);
   }
 
-  private coercePersonalRecord(record: Record<string, unknown>): PersonalRecord | null {
+  private coercePersonalRecord(
+    record: Record<string, unknown>,
+    warnings: string[] = [],
+  ): PersonalRecord | null {
     const { recordName, record: recordValue, recordUnit, exerciseType, date } = record;
 
     if (typeof recordName !== 'string' || !recordName.trim()) {
@@ -221,8 +230,27 @@ export class DataSyncService {
       recordUnit: recordUnit.trim(),
     };
 
+    let hasUnsupportedExerciseType = false;
     if (typeof exerciseType === 'string' && exerciseType.trim()) {
-      sanitizedRecord.exerciseType = exerciseType as PersonalRecord['exerciseType'];
+      const normalizedExerciseType = exerciseType.trim();
+      if (isExerciseType(normalizedExerciseType)) {
+        sanitizedRecord.exerciseType = normalizedExerciseType;
+      } else {
+        hasUnsupportedExerciseType = true;
+      }
+    } else if (
+      exerciseType !== undefined
+      && exerciseType !== null
+      && typeof exerciseType !== 'string'
+    ) {
+      hasUnsupportedExerciseType = true;
+    }
+
+    if (hasUnsupportedExerciseType) {
+      sanitizedRecord.exerciseType = ExerciseEnum.NONE;
+      if (!warnings.includes(DataSyncService.UNSUPPORTED_EXERCISE_TYPE_WARNING)) {
+        warnings.push(DataSyncService.UNSUPPORTED_EXERCISE_TYPE_WARNING);
+      }
     }
 
     if (typeof date === 'string' && date) {

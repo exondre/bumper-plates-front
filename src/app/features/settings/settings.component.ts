@@ -164,8 +164,15 @@ export class SettingsComponent implements OnInit, OnDestroy {
           resources: [DataSyncResource.PersonalRecords],
         });
         if (result.importedResources.includes(DataSyncResource.PersonalRecords)) {
-          const warnings = result.warnings.length > 0 ? ` (${result.warnings.join(' ')})` : '';
-          this.setFeedback('Las marcas personales se importaron correctamente.' + warnings, 'success');
+          if (result.warnings.length > 0) {
+            this.setFeedback(
+              `Las marcas personales se importaron con advertencias. ${result.warnings.join(' ')}`,
+              'warning',
+              true,
+            );
+          } else {
+            this.setFeedback('Las marcas personales se importaron correctamente.', 'success');
+          }
           this.sharedService.sendReloadPR();
         } else {
           const warningMessage = result.warnings.join(' ') || 'No se importaron marcas personales.';

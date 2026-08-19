@@ -26,8 +26,12 @@
           <label for="recordExcerciseType" class="form-label">Tipo de ejercicio</label>
           <select id="recordExcerciseType" class="form-select" [(ngModel)]="recordExcerciseType"
             name="recordExcerciseType" required>
-            @for (type of exerciseTypes; track type) {
-            <option [value]="type">{{ type | exerciseLabel }}</option>
+            @for (group of exerciseGroups; track group.label) {
+              <optgroup [label]="group.label">
+                @for (exercise of group.exercises; track exercise.id) {
+                  <option [value]="exercise.id">{{ exercise.label }}</option>
+                }
+              </optgroup>
             }
           </select>
         </div>

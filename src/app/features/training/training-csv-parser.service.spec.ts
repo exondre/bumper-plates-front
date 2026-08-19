@@ -64,6 +64,22 @@ describe('TrainingCsvParserService', () => {
     expect(result.sessions[0].exercises[0].exerciseType).toBe(ExerciseEnum.CLEAN_AND_JERK);
   });
 
+  it('accepts new canonical exercise types and ignores unsupported tokens', () => {
+    const result = service.parseCsv(
+      [
+        'sesión;ejercicio;exercise_type;70',
+        '1;Hang power snatch;HANG_POWER_SNATCH;2',
+        '2;Tipo externo;EXTERNAL_MOVEMENT;3',
+        '3;Trabajo sin tipo;NONE;4',
+      ].join('\n'),
+      'Semana con variantes',
+    );
+
+    expect(result.sessions[0].exercises[0].exerciseType).toBe(ExerciseEnum.HANG_POWER_SNATCH);
+    expect(result.sessions[1].exercises[0].exerciseType).toBeUndefined();
+    expect(result.sessions[2].exercises[0].exerciseType).toBe(ExerciseEnum.NONE);
+  });
+
   it('returns an empty week when the parsed csv has no valid sessions', () => {
     let idCounter = 0;
     spyOn<any>(service, 'shortId').and.callFake(() => `empty-${++idCounter}`);
