@@ -292,6 +292,22 @@ describe('PersonalRecordsComponent', () => {
     });
   });
 
+  it('renders the calculator only for the selected record when all records include the same exercise', () => {
+    preferences$.next({ showAllPersonalRecords: true });
+    createComponent();
+    const selectedRecord = component.personalRecords.find(record => record.recordName === 'Arranque viejo')!;
+    spyOn<any>(component, 'scrollCalculatorPanelIfNeeded').and.stub();
+
+    component.openCalculatorForPRAndPercentage(selectedRecord, 80);
+    fixture.detectChanges();
+
+    const calculatorPanels = fixture.nativeElement.querySelectorAll('[data-marks-calculator-panel="true"]');
+    const selectedRecordElement = fixture.nativeElement.querySelector('[data-selected-record="true"]');
+
+    expect(calculatorPanels.length).toBe(1);
+    expect(selectedRecordElement.querySelector('[data-marks-calculator-panel="true"]')).toBe(calculatorPanels[0]);
+  });
+
   it('scrolls calculator and selected record panels only when they are outside the comfortable viewport zone', () => {
     createComponent();
     setMatchMedia(false);

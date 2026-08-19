@@ -66,7 +66,7 @@
                 </div>
               }
 
-              @if (selectedCalculator?.exercise === p.exerciseType && selectedCalculator?.percentage === selectedPercentage) {
+              @if (isSelectedPR(p) && selectedCalculator?.exercise === p.exerciseType && selectedCalculator?.percentage === selectedPercentage) {
                 @let personalRecord =  p;
                 @let percentage = selectedPercentage; 
                 <div class="w-100" data-marks-calculator-panel="true">
