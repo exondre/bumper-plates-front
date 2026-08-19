@@ -143,6 +143,61 @@ describe('PersonalRecordsComponent', () => {
     expect(component.selectedBarbell).toEqual({ value: 20, unit: WeightUnitEnum.KG });
   });
 
+  it('tracks new exercise types independently and does not mutate legacy NONE records', () => {
+    localStorageService.getItem.and.returnValue(JSON.stringify([
+      {
+        recordName: 'Thruster antiguo',
+        record: 70,
+        recordUnit: 'kg',
+        exerciseType: ExerciseEnum.THRUSTER,
+        date: '2024-01-01T00:00:00.000Z',
+      },
+      {
+        recordName: 'Thruster reciente',
+        record: 75,
+        recordUnit: 'kg',
+        exerciseType: ExerciseEnum.THRUSTER,
+        date: '2024-02-01T00:00:00.000Z',
+      },
+      {
+        recordName: 'Press de banca',
+        record: 100,
+        recordUnit: 'kg',
+        exerciseType: ExerciseEnum.BENCH_PRESS,
+        date: '2024-03-01T00:00:00.000Z',
+      },
+      {
+        recordName: 'Hang squat clean sin tipo',
+        record: 80,
+        recordUnit: 'kg',
+        exerciseType: ExerciseEnum.NONE,
+        date: '2024-01-15T00:00:00.000Z',
+      },
+      {
+        recordName: 'Registro legado sin tipo',
+        record: 90,
+        recordUnit: 'kg',
+        date: '2024-03-15T00:00:00.000Z',
+      },
+    ]));
+
+    createComponent();
+
+    expect(component.personalRecords.map(record => record.recordName)).toEqual([
+      'Thruster reciente',
+      'Thruster antiguo',
+      'Press de banca',
+      'Registro legado sin tipo',
+      'Hang squat clean sin tipo',
+    ]);
+    expect(component.personalRecords.filter(record => record.isLatest).map(record => record.recordName)).toEqual([
+      'Thruster reciente',
+      'Press de banca',
+      'Registro legado sin tipo',
+    ]);
+    expect(localStorageService.setItem).not.toHaveBeenCalled();
+  });
+
   it('reacts to show new pr and reload events', () => {
     createComponent();
     const loadSpy = spyOn(component, 'loadPersonalRecords').and.callThrough();
@@ -390,7 +445,7 @@ describe('PersonalRecordsComponent', () => {
       recordName: 'A',
       record: 1,
       recordUnit: 'kg',
-      exerciseType: ExerciseEnum.SNATCH,
+      exerciseType: ExerciseEnum.HANG_POWER_SNATCH,
       date: new Date('2024-01-01T00:00:00.000Z'),
     })).toBeTrue();
 

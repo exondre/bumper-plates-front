@@ -1,7 +1,7 @@
 // src/app/features/training/training-csv-parser.service.ts
 import { Injectable } from '@angular/core';
 import * as Papa from 'papaparse';
-import { ExerciseEnum } from '../../shared/enums/ExerciseEnum';
+import { isExerciseType } from '../../shared/constants/exercise-catalog';
 import {
   TrainingSession,
   TrainingSet,
@@ -35,7 +35,9 @@ export class TrainingCsvParserService {
         .split(/,|-/)
         .map((s: string) => s.trim());
       const name = row.ejercicio;
-      const exerciseType = row.exercise_type as ExerciseEnum;
+      const exerciseType = isExerciseType(row.exercise_type)
+        ? row.exercise_type
+        : undefined;
       const repLibres = row.rep_libres;
 
       const sets: TrainingSet[] = percentColumns
@@ -56,7 +58,7 @@ export class TrainingCsvParserService {
         sessionMap[sessionNum].exercises.push({
           id: this.shortId(),
           name,
-          exerciseType: exerciseType || undefined,
+          exerciseType,
           repLibres: repLibres || undefined,
           sets,
         });

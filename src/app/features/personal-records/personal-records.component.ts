@@ -5,6 +5,7 @@ import { Subscription } from 'rxjs';
 import { BumperPlatesCalculatorComponent } from '../bumper-plates-calculator/bumper-plates-calculator.component';
 import { LocalStorageService } from '../../service/local-storage.service';
 import { SharedService } from '../../service/shared.service';
+import { getExerciseRecordOrder, isExerciseType } from '../../shared/constants/exercise-catalog';
 import { LSKeysEnum } from '../../shared/enums/LSKeysEnum';
 import { ExerciseEnum } from '../../shared/enums/ExerciseEnum';
 import { WeightUnitEnum } from '../../shared/enums/weight-unit.enum';
@@ -306,10 +307,7 @@ export class PersonalRecordsComponent implements OnDestroy, OnInit {
     return elementCenter >= comfortableTop && elementCenter <= comfortableBottom;
   }
 
-  /**
-   * Sorts personal records prioritizing snatch, clean & jerk, and then remaining entries alphabetically.
-   * Records within the same exercise type are ordered by recency.
-   */
+  /** Sorts exercise groups by catalog order and records within each group by recency. */
   private sortPersonalRecords(records: PersonalRecord[]): PersonalRecord[] {
     const toTimestamp = (record: PersonalRecord): number => {
       const rawDate = record.date;
@@ -322,53 +320,37 @@ export class PersonalRecordsComponent implements OnDestroy, OnInit {
       return Number.isNaN(timestamp) ? Number.NEGATIVE_INFINITY : timestamp;
     };
 
-    const exercisePriority = (exerciseType?: ExerciseEnum): number => {
-      if (exerciseType === ExerciseEnum.SNATCH) {
-        return 0;
-      }
-
-      if (exerciseType === ExerciseEnum.CLEAN_AND_JERK) {
-        return 1;
-      }
-
-      return 2;
-    };
-
     const normalizedRecords = records.map(record => ({
       ...record,
       isLatest: false,
     }));
 
     const sortedRecords = [...normalizedRecords].sort((a, b) => {
-      const priorityA = exercisePriority(a.exerciseType);
-      const priorityB = exercisePriority(b.exerciseType);
-      const priorityDiff = priorityA - priorityB;
-      if (priorityDiff !== 0) {
-        return priorityDiff;
+      const exerciseTypeA = a.exerciseType ?? ExerciseEnum.NONE;
+      const exerciseTypeB = b.exerciseType ?? ExerciseEnum.NONE;
+      const orderDiff = getExerciseRecordOrder(exerciseTypeA)
+        - getExerciseRecordOrder(exerciseTypeB);
+      if (orderDiff !== 0) {
+        return orderDiff;
       }
 
-      if (priorityA < 2 && priorityB < 2) {
-        const timestampDiff = toTimestamp(b) - toTimestamp(a);
-        if (timestampDiff !== 0) {
-          return timestampDiff;
-        }
-
-        return a.recordName.localeCompare(b.recordName, undefined, {
+      if (exerciseTypeA !== exerciseTypeB) {
+        return exerciseTypeA.localeCompare(exerciseTypeB, undefined, {
           sensitivity: 'base',
         });
       }
 
-      const nameDiff = a.recordName.localeCompare(b.recordName, undefined, {
-        sensitivity: 'base',
-      });
-      if (nameDiff !== 0) {
-        return nameDiff;
+      const timestampDiff = toTimestamp(b) - toTimestamp(a);
+      if (timestampDiff !== 0) {
+        return timestampDiff;
       }
 
-      return toTimestamp(b) - toTimestamp(a);
+      return a.recordName.localeCompare(b.recordName, undefined, {
+        sensitivity: 'base',
+      });
     });
 
-    const latestByExercise = new Map<ExerciseEnum | undefined, {
+    const latestByExercise = new Map<ExerciseEnum, {
       timestamp: number;
       record: PersonalRecord;
     }>();
@@ -379,9 +361,10 @@ export class PersonalRecordsComponent implements OnDestroy, OnInit {
         return;
       }
 
-      const existing = latestByExercise.get(record.exerciseType);
+      const exerciseType = record.exerciseType ?? ExerciseEnum.NONE;
+      const existing = latestByExercise.get(exerciseType);
       if (!existing || timestamp > existing.timestamp) {
-        latestByExercise.set(record.exerciseType, { timestamp, record });
+        latestByExercise.set(exerciseType, { timestamp, record });
       }
     });
 
@@ -509,7 +492,7 @@ export class PersonalRecordsComponent implements OnDestroy, OnInit {
       return false;
     }
 
-    if (candidate.exerciseType !== undefined && !Object.values(ExerciseEnum).includes(candidate.exerciseType)) {
+    if (candidate.exerciseType !== undefined && !isExerciseType(candidate.exerciseType)) {
       return false;
     }
 

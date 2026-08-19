@@ -1,19 +1,13 @@
 import { Pipe, PipeTransform } from '@angular/core';
+import { getExerciseLabel } from '../constants/exercise-catalog';
+import { ExerciseEnum } from '../enums/ExerciseEnum';
 
 @Pipe({
   name: 'exerciseLabel',
   standalone: true,
 })
 export class ExerciseLabelPipe implements PipeTransform {
-  transform(value: string): string {
-    const labels: Record<string, string> = {
-      SNATCH: 'Arranque',
-      CLEAN_AND_JERK: 'Envión',
-      FRONT_SQUAT: 'Sentadilla frontal',
-      BACK_SQUAT: 'Sentadilla trasera',
-      NONE: 'Sin tipo',
-    };
-    return labels[value] ?? value;
+  transform(value: string | null | undefined): string {
+    return getExerciseLabel(value ?? ExerciseEnum.NONE);
   }
 }
-// This pipe transforms exercise type strings into user-friendly labels.
